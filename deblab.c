@@ -10,7 +10,7 @@ int main(void){
     int case_N,case_E,case_S,case_O,case_I;
     char nom_jeu[50];
     
-    connectToServer("172.195.76.204",1234,"DONTMOVE");
+    connectToServer("172.195.76.204",5678,"DONTMOVE");
     waitForLabyrinth("TRAINING DONTMOVE",nom_jeu,&tailleX,&tailleY);
     numero_joueur = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
     closeConnection();
@@ -20,7 +20,7 @@ int main(void){
     t_move mouv_joueur;
     int num_mouv_joueur;
 
-    while (1){
+    /*while (1){
         if (numero_joueur == 0){
             num_mouv_joueur = sendMove(&mouv_joueur);
             num_mouv_bot = getMove(&mouv_bot);
@@ -49,7 +49,7 @@ int main(void){
             return 0;
         }
         
-    }
+    }*/
     
     return 0;
 }
