@@ -22,25 +22,10 @@ int main(void){
     int num_mouv_joueur;
 
     while (1){
-        if (numero_joueur == 0){
-            num_mouv_joueur = sendMove(&mouv_joueur);
-            num_mouv_bot = getMove(&mouv_bot);
-        }
-        else{
-            num_mouv_bot = getMove(&mouv_bot);
-            num_mouv_joueur = sendMove(&mouv_joueur);
-        }
+        num_mouv_joueur = sendMove(mouv_joueur);
 
         printLabyrinth();
 
-        if (num_mouv_bot == 1){
-            printf("Le bot a gagné");
-            return 0;
-        }
-        else if (num_mouv_bot == -1){
-            printf("Le bot a fait un mouvement illégal, il perd,vous gagnez");
-            return 0;
-        }
         if (num_mouv_joueur == 1){
             printf("Vous avez gagné");
             return 0;
