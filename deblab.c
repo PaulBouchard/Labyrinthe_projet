@@ -29,33 +29,45 @@ void demande_coup_joueur(t_move * mouvement){
     scanf("%d %d",&mouvement->x,&mouvement->y);
 }
 
-int main(void){
-    int numero_joueur_depart,num_mouv_joueur,num_mouv_bot = 0;
-    int tailleX,tailleY;
-    int case_N,case_E,case_S,case_O,case_I;
-    char nom_jeu[50];
-    t_move mouv_joueur,mouv_bot;
-
-    connectToServer("172.105.76.204",1234,"DONTMOVE");
+int init_jeu(char nom_jeu[50],int tailleX,int tailleY,int * lab,int case_N,int case_E,int case_S,int case_O,int case_I){
+    int numero_joueur_depart;
+    
     waitForLabyrinth("TRAINING DONTMOVE timeout=1000",nom_jeu,&tailleX,&tailleY);
-    int *lab = malloc(5*tailleX*tailleY*sizeof(int));
+    
+    lab = malloc(5*tailleX*tailleY*sizeof(int));
+    
     numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
     
-    if (numero_joueur_depart == 1){
-        getMove(&mouv_bot);
-        printLabyrinth();
-    }
-    else{
-        printLabyrinth();
-    }
+    return numero_joueur_depart;
+}
 
+int main(void){
+    /* Déclaration des variables */
+    int numero_joueur_depart,num_mouv_joueur,num_mouv_bot;
+    int tailleX = 0,tailleY = 0,case_N = 0,case_E = 0,case_S = 0,case_O = 0,case_I = 0;
+    char nom_jeu[50];
+    int * lab = malloc(0);
+    t_move mouv_joueur,mouv_bot;
+    
+    /* Connection au serveur et récupération des données */
+    connectToServer("172.105.76.204",1234,"DONTMOVE");
+    numero_joueur_depart = init_jeu(nom_jeu,tailleX,tailleY,lab,case_N,case_E,case_S,case_O,case_I);
+    
+    /* Début de partie */
     while (1){
-        demande_coup_joueur(&mouv_joueur);
-
-        num_mouv_joueur = sendMove(&mouv_joueur);
-
-        num_mouv_bot = getMove(&mouv_bot);
-        printLabyrinth();
+        
+        if (numero_joueur_depart == 1){
+            num_mouv_bot = getMove(&mouv_bot);
+            printLabyrinth();
+            demande_coup_joueur(&mouv_joueur);
+            num_mouv_joueur = sendMove(&mouv_joueur);
+        }
+        else if(numero_joueur_depart == 0){
+            printLabyrinth();
+            demande_coup_joueur(&mouv_joueur);
+            num_mouv_joueur = sendMove(&mouv_joueur);
+            num_mouv_bot = getMove(&mouv_bot);
+        }       
 
         if (num_mouv_joueur == 1){
             printf("Vous avez gagné");
