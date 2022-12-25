@@ -4,14 +4,26 @@
 #include "clientAPI.h"
 
 typedef struct{
-    int x_j,y_j;
-    int x_b,y_b;
-}t_position_j;
+    int x1,y1;
+    int nextI1;
+}t_position1;
+
+typedef struct{
+    int x2,y2;
+    int nextI2;
+}t_position2;
 
 typedef struct{
     int tileN,tileS,tileW,tileE;
     int tileI;
-}t_tuile_supp;
+}t_tuile;
+
+typedef struct{
+    t_position1 joueur1;
+    t_position2 joueur2;
+    t_tuile tuile_supplementaire;
+    int tailleX,tailleY;
+}t_labyrinthe;
 
 void demande_coup_joueur(t_move * mouvement){
     int intermediaire_typenum;
@@ -41,6 +53,16 @@ int init_jeu(char nom_jeu[50],int tailleX,int tailleY,int * lab,int case_N,int c
     return numero_joueur_depart;
 }
 
+void MaJDonnees1(t_move mouvement,t_labyrinthe * donnees,t_tuile laby[0][0]){
+    donnees->joueur1.x1 = mouvement.x;
+    donnees->joueur1.y1 = mouvement.y;
+    donnees->joueur1.nextI1 = mouvement.nextItem;
+    donnees->tuile_supplementaire.tileN = mouvement.tileN;
+    donnees->tuile_supplementaire.tileS = mouvement.tileS;
+    donnees->tuile_supplementaire.tileE = mouvement.tileE;
+    donnees->tuile_supplementaire.tileW = mouvement.tileW;
+}
+
 int main(void){
     /* Déclaration des variables */
     int numero_joueur_depart,num_mouv_joueur,num_mouv_bot;
@@ -48,7 +70,7 @@ int main(void){
     char nom_jeu[50];
     int * lab = malloc(0);
     t_move mouv_joueur,mouv_bot;
-    
+
     /* Connection au serveur et récupération des données */
     connectToServer("172.105.76.204",1234,"DONTMOVE");
     numero_joueur_depart = init_jeu(nom_jeu,tailleX,tailleY,lab,case_N,case_E,case_S,case_O,case_I);
