@@ -3,6 +3,16 @@
 #include "labyrinthAPI.h"
 #include "clientAPI.h"
 
+typedef struct{
+    int x_j,y_j;
+    int x_b,y_b;
+}t_position_j;
+
+typedef struct{
+    int tileN,tileS,tileW,tileE;
+    int tileI;
+}t_tuile_supp;
+
 void demande_coup_joueur(t_move * mouvement){
     int intermediaire_typenum;
     printf("Entrez un chiffre entre 0 et 3 indiquant par quel côté la piece sera insérée (0=O,1=E,2=N,S=3)\n");
