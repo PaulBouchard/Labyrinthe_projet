@@ -3,15 +3,13 @@
 #include "labyrinthAPI.h"
 #include "clientAPI.h"
 
-typedef struct{
-    int x1,y1;
-    int nextI1;
-}t_position1;
+#define X 10
+#define Y 10
 
 typedef struct{
-    int x2,y2;
-    int nextI2;
-}t_position2;
+    int x,y;
+    int nextI;
+}t_position;
 
 typedef struct{
     int tileN,tileS,tileW,tileE;
@@ -19,8 +17,8 @@ typedef struct{
 }t_tuile;
 
 typedef struct{
-    t_position1 joueur1;
-    t_position2 joueur2;
+    t_position joueur1;
+    t_position joueur2;
     t_tuile tuile_supplementaire;
     int tailleX,tailleY;
 }t_labyrinthe;
@@ -53,14 +51,72 @@ int init_jeu(char nom_jeu[50],int tailleX,int tailleY,int * lab,int case_N,int c
     return numero_joueur_depart;
 }
 
-void MaJDonnees1(t_move mouvement,t_labyrinthe * donnees,t_tuile laby[0][0]){
-    donnees->joueur1.x1 = mouvement.x;
-    donnees->joueur1.y1 = mouvement.y;
-    donnees->joueur1.nextI1 = mouvement.nextItem;
-    donnees->tuile_supplementaire.tileN = mouvement.tileN;
-    donnees->tuile_supplementaire.tileS = mouvement.tileS;
-    donnees->tuile_supplementaire.tileE = mouvement.tileE;
-    donnees->tuile_supplementaire.tileW = mouvement.tileW;
+int rotation(int angle,t_tuile *tile){
+    int inter = tile->tileN;
+    if (angle == 0){
+        return 0;
+    }
+    else{
+        tile->tileN = tile->tileW;
+        tile->tileW = tile->tileS;
+        tile->tileS = tile->tileE;
+        tile->tileE = inter;
+        rotation(angle-1,tile);
+    }
+    return 0;
+}
+
+void MaJDonnees1(t_move mouvement,t_labyrinthe * donnees,t_tuile * laby[X][Y],int num_depart){
+    t_tuile inter;
+    /* Récupération des positions et du prochain trésor */
+    if (num_depart == 1){
+        donnees->joueur2.x = mouvement.x;
+        donnees->joueur2.y = mouvement.y;
+        donnees->joueur2.nextI = mouvement.nextItem;
+    }
+    if (num_depart == 0){
+        donnees->joueur1.x = mouvement.x;
+        donnees->joueur1.y = mouvement.y;
+        donnees->joueur1.nextI = mouvement.nextItem;
+    }
+
+    /* Modification du labyrinthe selon la tuile insérée et le côté choisi */
+    if (mouvement.insert == 0){
+        inter = *laby[X-1][mouvement.number];
+        for (int i = X-1;i > 0; i--){
+            *laby[i][mouvement.number] = *laby[i-1][mouvement.number];
+        }
+        rotation(mouvement.rotation,&donnees->tuile_supplementaire);
+        *laby[0][mouvement.number] = donnees->tuile_supplementaire;
+        donnees->tuile_supplementaire = inter;
+    }
+    else if (mouvement.insert == 1){
+        inter = *laby[0][mouvement.number];
+        for (int i = 0;i < X-1; i++){
+            *laby[i][mouvement.number] = *laby[i+1][mouvement.number];
+        }
+        rotation(mouvement.rotation,&donnees->tuile_supplementaire);
+        *laby[X-1][mouvement.number] = donnees->tuile_supplementaire;
+        donnees->tuile_supplementaire = inter;
+    }
+    else if (mouvement.insert == 2){
+        inter = *laby[mouvement.number][Y-1];
+        for (int i = Y-1;i > 0; i--){
+            *laby[mouvement.number][i] = *laby[mouvement.number][i-1];
+        }
+        rotation(mouvement.rotation,&donnees->tuile_supplementaire);
+        *laby[mouvement.number][0] = donnees->tuile_supplementaire;
+        donnees->tuile_supplementaire = inter;
+    }
+    else if (mouvement.insert == 3){
+        inter = *laby[mouvement.number][0];
+        for (int i = 0;i < Y-1; i++){
+            *laby[mouvement.number][i] = *laby[mouvement.number][i+1];
+        }
+        rotation(mouvement.rotation,&donnees->tuile_supplementaire);
+        *laby[mouvement.number][Y-1] = donnees->tuile_supplementaire;
+        donnees->tuile_supplementaire = inter;
+    }
 }
 
 int main(void){
