@@ -20,7 +20,6 @@ typedef struct{
     t_position joueur1;
     t_position joueur2;
     t_tuile tuile_supplementaire;
-    int tailleX,tailleY;
 }t_labyrinthe;
 
 void demande_coup_joueur(t_move * mouvement){
@@ -42,7 +41,7 @@ void demande_coup_joueur(t_move * mouvement){
 int init_jeu(char nom_jeu[50],int tailleX,int tailleY,int * lab,int case_N,int case_E,int case_S,int case_O,int case_I){
     int numero_joueur_depart;
     
-    waitForLabyrinth("TRAINING DONTMOVE timeout=1000",nom_jeu,&tailleX,&tailleY);
+    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 display=debug",nom_jeu,&tailleX,&tailleY);
     
     lab = malloc(5*tailleX*tailleY*sizeof(int));
     
@@ -68,6 +67,7 @@ int rotation(int angle,t_tuile *tile){
 
 void MaJDonnees1(t_move mouvement,t_labyrinthe * donnees,t_tuile * laby[X][Y],int num_depart){
     t_tuile inter;
+    
     /* Récupération des positions et du prochain trésor */
     if (num_depart == 1){
         donnees->joueur2.x = mouvement.x;
@@ -131,19 +131,31 @@ int main(void){
     connectToServer("172.105.76.204",1234,"DONTMOVE");
     numero_joueur_depart = init_jeu(nom_jeu,tailleX,tailleY,lab,case_N,case_E,case_S,case_O,case_I);
     
+    printLabyrinth();
+
     /* Début de partie */
-    while (1){
+    /*while (1){
         
         if (numero_joueur_depart == 1){
             num_mouv_bot = getMove(&mouv_bot);
+            
             printLabyrinth();
+            
             demande_coup_joueur(&mouv_joueur);
+            
             num_mouv_joueur = sendMove(&mouv_joueur);
+
+            printLabyrinth();
         }
         else if(numero_joueur_depart == 0){
             printLabyrinth();
+            
             demande_coup_joueur(&mouv_joueur);
+            
             num_mouv_joueur = sendMove(&mouv_joueur);
+
+            printLabyrinth();
+            
             num_mouv_bot = getMove(&mouv_bot);
         }       
 
@@ -168,7 +180,7 @@ int main(void){
             closeConnection();
             return 0;
         }   
-    }
+    }*/
     closeConnection();
     return 0;
 }
