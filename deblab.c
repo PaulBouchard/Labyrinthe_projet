@@ -45,8 +45,8 @@ void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,i
     laby->joueur1.nextI = 1;
 
     /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
-    laby->joueur2.x = tx-1;
-    laby->joueur2.y = ty-1;
+    laby->joueur2.x = tx - 1;
+    laby->joueur2.y = ty - 1;
     laby->joueur2.nextI = 1;
 
     /* Initialisation de la tuile supplémentaire */
@@ -59,7 +59,7 @@ void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,i
     /* Remplissage du labyrinthe */
     int j = 0;
     for (int i = 0;i < 5*tx*ty;i = i+5){
-        printf("[%d]",j);
+        printf("[%d] ",j);
         labyrinthe[j].tileN = lab[i];
         labyrinthe[j].tileE = lab[i+1];
         labyrinthe[j].tileS = lab[i+2];
@@ -149,9 +149,12 @@ int main(void){
     /* Connection au serveur et récupération des données */
     connectToServer("172.105.76.204",1234,"DONTMOVE");
     waitForLabyrinth("TRAINING DONTMOVE timeout=1000 display=debug",nom_jeu,&tailleX,&tailleY);
+    
     int * lab = malloc(5*tailleX*tailleY*sizeof(int));
     numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
-    t_tuile * labyrinthe = malloc(tailleX*tailleY);
+    
+    t_tuile * labyrinthe = malloc(5*tailleX*tailleY*sizeof(int));
+    
     printLabyrinth();
     printf("tailleX = %d\ntailleY = %d\n",tailleX,tailleY);
 
@@ -163,10 +166,10 @@ int main(void){
         printf("[%d%d%d%d%d] ",lab[k],lab[k+1],lab[k+2],lab[k+3],lab[k+4]);
     }
 
-    /*printf("\n\n");
+    printf("\n\n");
     for (int k=0;k<tailleX*tailleY;k++){
         printf("[%d%d%d%d%d] ",labyrinthe[k].tileN,labyrinthe[k].tileE,labyrinthe[k].tileS,labyrinthe[k].tileW,labyrinthe[k].tileI);
-    }*/
+    }
     
 
     /* Début de partie */
