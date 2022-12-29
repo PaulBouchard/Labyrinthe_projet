@@ -38,15 +38,15 @@ void demande_coup_joueur(t_move * mouvement){
     scanf("%d %d",&mouvement->x,&mouvement->y);
 }
 
-void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,int case_I){
+void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile * labyrinthe){
     /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
     laby->joueur1.x = 0;
     laby->joueur1.y = 0;
     laby->joueur1.nextI = 1;
 
     /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
-    laby->joueur2.x = 0;
-    laby->joueur2.y = 0;
+    laby->joueur2.x = tx-1;
+    laby->joueur2.y = ty-1;
     laby->joueur2.nextI = 1;
 
     /* Initialisation de la tuile supplémentaire */
@@ -55,6 +55,18 @@ void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,i
     laby->tuile_supplementaire.tileS = case_S;
     laby->tuile_supplementaire.tileW = case_O;
     laby->tuile_supplementaire.tileI = case_I;
+
+    /* Remplissage du labyrinthe */
+    int j = 0;
+    for (int i = 0;i < 5*tx*ty;i = i+5){
+        printf("[%d]",j);
+        labyrinthe[j].tileN = lab[i];
+        labyrinthe[j].tileE = lab[i+1];
+        labyrinthe[j].tileS = lab[i+2];
+        labyrinthe[j].tileW = lab[i+3];
+        labyrinthe[j].tileI = lab[i+4];
+        j = j + 1;
+    }
 }
 
 int rotation(int angle,t_tuile *tile){
@@ -139,8 +151,23 @@ int main(void){
     waitForLabyrinth("TRAINING DONTMOVE timeout=1000 display=debug",nom_jeu,&tailleX,&tailleY);
     int * lab = malloc(5*tailleX*tailleY*sizeof(int));
     numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
-
+    t_tuile * labyrinthe = malloc(tailleX*tailleY);
     printLabyrinth();
+    printf("tailleX = %d\ntailleY = %d\n",tailleX,tailleY);
+
+    t_labyrinthe donnees;
+    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);
+    
+    printf("\n\n");
+    for (int k=0;k<5*tailleX*tailleY;k = k +5){
+        printf("[%d%d%d%d%d] ",lab[k],lab[k+1],lab[k+2],lab[k+3],lab[k+4]);
+    }
+
+    /*printf("\n\n");
+    for (int k=0;k<tailleX*tailleY;k++){
+        printf("[%d%d%d%d%d] ",labyrinthe[k].tileN,labyrinthe[k].tileE,labyrinthe[k].tileS,labyrinthe[k].tileW,labyrinthe[k].tileI);
+    }*/
+    
 
     /* Début de partie */
     /*while (1){
