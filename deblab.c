@@ -38,16 +38,23 @@ void demande_coup_joueur(t_move * mouvement){
     scanf("%d %d",&mouvement->x,&mouvement->y);
 }
 
-int init_jeu(char nom_jeu[50],int tailleX,int tailleY,int * lab,int case_N,int case_E,int case_S,int case_O,int case_I){
-    int numero_joueur_depart;
-    
-    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 display=debug",nom_jeu,&tailleX,&tailleY);
-    
-    lab = malloc(5*tailleX*tailleY*sizeof(int));
-    
-    numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
-    
-    return numero_joueur_depart;
+void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,int case_I){
+    /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
+    laby->joueur1.x = 0;
+    laby->joueur1.y = 0;
+    laby->joueur1.nextI = 1;
+
+    /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
+    laby->joueur2.x = 0;
+    laby->joueur2.y = 0;
+    laby->joueur2.nextI = 1;
+
+    /* Initialisation de la tuile supplémentaire */
+    laby->tuile_supplementaire.tileN = case_N;
+    laby->tuile_supplementaire.tileE = case_E;
+    laby->tuile_supplementaire.tileS = case_S;
+    laby->tuile_supplementaire.tileW = case_O;
+    laby->tuile_supplementaire.tileI = case_I;
 }
 
 int rotation(int angle,t_tuile *tile){
@@ -119,18 +126,20 @@ void MaJDonnees1(t_move mouvement,t_labyrinthe * donnees,t_tuile * laby[X][Y],in
     }
 }
 
+
 int main(void){
     /* Déclaration des variables */
     int numero_joueur_depart,num_mouv_joueur,num_mouv_bot;
-    int tailleX = 0,tailleY = 0,case_N = 0,case_E = 0,case_S = 0,case_O = 0,case_I = 0;
+    int tailleX,tailleY,case_N,case_E,case_S,case_O,case_I;
     char nom_jeu[50];
-    int * lab = malloc(0);
     t_move mouv_joueur,mouv_bot;
 
     /* Connection au serveur et récupération des données */
     connectToServer("172.105.76.204",1234,"DONTMOVE");
-    numero_joueur_depart = init_jeu(nom_jeu,tailleX,tailleY,lab,case_N,case_E,case_S,case_O,case_I);
-    
+    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 display=debug",nom_jeu,&tailleX,&tailleY);
+    int * lab = malloc(5*tailleX*tailleY*sizeof(int));
+    numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
+
     printLabyrinth();
 
     /* Début de partie */
