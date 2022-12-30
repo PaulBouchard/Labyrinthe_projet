@@ -71,7 +71,7 @@ void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,i
         j = j + 1;
     }
     
-    int j = 0;
+    j = 0;
     int n=0;
     int m=0;
     for (int k = 0;k<tx*ty;k++){
