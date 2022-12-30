@@ -24,9 +24,8 @@ typedef struct{
 
 void demande_coup_joueur(t_move * mouvement){
     int intermediaire_typenum;
-    printf("Entrez un chiffre entre 0 et 3 indiquant par quel côté la piece sera insérée (0=O,1=E,2=N,S=3)\n");
-    scanf("%d",&intermediaire_typenum);
-    mouvement->insert = intermediaire_typenum;
+    /*printf("Entrez un chiffre entre 0 et 3 indiquant par quel côté la piece sera insérée (0=O,1=E,2=N,S=3)\n");
+    
         
     printf("Entrez le numéro de la ligne ou de la colonne dans laquelle ira la pièce\n");
     scanf("%d",&mouvement->number);
@@ -35,7 +34,11 @@ void demande_coup_joueur(t_move * mouvement){
     scanf("%d",&mouvement->rotation);
 
     printf("Entrez les coordonnées de la case où vous voulez aller (x y)\n");
-    scanf("%d %d",&mouvement->x,&mouvement->y);
+    scanf("%d %d",&mouvement->x,&mouvement->y);*/
+
+    printf("coup -> ");
+    scanf("%d %d %d %d %d",&intermediaire_typenum,&mouvement->number,&mouvement->rotation,&mouvement->x,&mouvement->y);
+    mouvement->insert = intermediaire_typenum;
 }
 
 void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile * labyrinthe){
@@ -59,7 +62,6 @@ void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,i
     /* Remplissage du labyrinthe */
     int j = 0;
     for (int i = 0;i < 5*tx*ty;i = i+5){
-        printf("[%d] ",j);
         labyrinthe[j].tileN = lab[i];
         labyrinthe[j].tileE = lab[i+1];
         labyrinthe[j].tileS = lab[i+2];
@@ -155,30 +157,59 @@ int main(void){
     
     t_tuile * labyrinthe = malloc(5*tailleX*tailleY*sizeof(int));
     
-    printLabyrinth();
     printf("tailleX = %d\ntailleY = %d\n",tailleX,tailleY);
 
     t_labyrinthe donnees;
-    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);
-    
-    printf("\n\n");
-    for (int k=0;k<5*tailleX*tailleY;k = k +5){
-        printf("[%d%d%d%d%d] ",lab[k],lab[k+1],lab[k+2],lab[k+3],lab[k+4]);
-    }
+    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);    
 
-    printf("\n\n");
-    for (int k=0;k<tailleX*tailleY;k++){
-        printf("[%d%d%d%d%d] ",labyrinthe[k].tileN,labyrinthe[k].tileE,labyrinthe[k].tileS,labyrinthe[k].tileW,labyrinthe[k].tileI);
-    }
+    t_tuile (*look)[tailleX];
+    look = malloc(sizeof(*look)*tailleY);
+    look = malloc(sizeof(int[tailleY][tailleX]));
+    /*
+    int j = 0;
+    for (int k = 0;k<tailleY;k++){
+        for (int l = 0;l<5*tailleX;l = l+5){
+            look[k][j].tileN = lab[l+5*k];
+            look[k][j].tileE = lab[l+1+5*k];
+            look[k][j].tileS = lab[l+2+5*k];
+            look[k][j].tileW = lab[l+3+5*k];
+            look[k][j].tileI = lab[l+4+5*k];
+            j=j+1;
+        }
+        j=0;
+    }*/
+
     
 
+    printLabyrinth();
+    
+    int j = 0;
+    int n=0;
+    int m=0;
+    for (int k = 0;k<tailleX*tailleY;k++){
+        j=j+1;
+        if (j-1==tailleX){
+            printf("\n");
+            j=1;
+            n=0;
+            m=m+1;
+        }
+        look[m][n] = labyrinthe[k];
+        n=n+1;
+        printf("%d%d%d%d%d ",labyrinthe[k].tileN,labyrinthe[k].tileE,labyrinthe[k].tileS,labyrinthe[k].tileW,labyrinthe[k].tileI);
+    }
+    printf("\n\n");
+    for (int k=0;k<tailleY;k++){
+        for (int p = 0;p<tailleX;p++){
+            printf("%d%d%d%d%d ",look[k][p].tileN,look[k][p].tileE,look[k][p].tileS,look[k][p].tileW,look[k][p].tileI);
+        }
+        printf("\n");
+    }
     /* Début de partie */
     /*while (1){
         
         if (numero_joueur_depart == 1){
             num_mouv_bot = getMove(&mouv_bot);
-            
-            printLabyrinth();
             
             demande_coup_joueur(&mouv_joueur);
             
@@ -193,8 +224,6 @@ int main(void){
             
             num_mouv_joueur = sendMove(&mouv_joueur);
 
-            printLabyrinth();
-            
             num_mouv_bot = getMove(&mouv_bot);
         }       
 
