@@ -41,7 +41,7 @@ void demande_coup_joueur(t_move * mouvement){
     mouvement->insert = intermediaire_typenum;
 }
 
-void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile * labyrinthe){
+void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile * look){
     /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
     laby->joueur1.x = 0;
     laby->joueur1.y = 0;
@@ -60,6 +60,7 @@ void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,i
     laby->tuile_supplementaire.tileI = case_I;
 
     /* Remplissage du labyrinthe */
+    t_tuile * labyrinthe = malloc(5*tx*ty*sizeof(int));
     int j = 0;
     for (int i = 0;i < 5*tx*ty;i = i+5){
         labyrinthe[j].tileN = lab[i];
@@ -68,6 +69,21 @@ void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,i
         labyrinthe[j].tileW = lab[i+3];
         labyrinthe[j].tileI = lab[i+4];
         j = j + 1;
+    }
+    
+    int j = 0;
+    int n=0;
+    int m=0;
+    for (int k = 0;k<tx*ty;k++){
+        j=j+1;
+        if (j-1==tailleX){
+            printf("\n");
+            j=1;
+            n=0;
+            m=m+1;
+        }
+        look[m][n] = labyrinthe[k];
+        n=n+1;
     }
 }
 
@@ -155,8 +171,6 @@ int main(void){
     int * lab = malloc(5*tailleX*tailleY*sizeof(int));
     numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
     
-    t_tuile * labyrinthe = malloc(5*tailleX*tailleY*sizeof(int));
-    
     printf("tailleX = %d\ntailleY = %d\n",tailleX,tailleY);
 
     t_labyrinthe donnees;
@@ -165,21 +179,6 @@ int main(void){
     t_tuile (*look)[tailleX];
     look = malloc(sizeof(*look)*tailleY);
     look = malloc(sizeof(int[tailleY][tailleX]));
-    /*
-    int j = 0;
-    for (int k = 0;k<tailleY;k++){
-        for (int l = 0;l<5*tailleX;l = l+5){
-            look[k][j].tileN = lab[l+5*k];
-            look[k][j].tileE = lab[l+1+5*k];
-            look[k][j].tileS = lab[l+2+5*k];
-            look[k][j].tileW = lab[l+3+5*k];
-            look[k][j].tileI = lab[l+4+5*k];
-            j=j+1;
-        }
-        j=0;
-    }*/
-
-    
 
     printLabyrinth();
     
