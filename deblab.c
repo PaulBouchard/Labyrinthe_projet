@@ -102,22 +102,42 @@ int rotation(int angle,t_tuile *tile){
     return 0;   // Au cas où
 }
 
+void insertionLigne(int ligne,int max,int min,int plusmoins,int angle_rot,int tx,int ty,t_tuile laby[ty][tx],t_tuile * tuilesupp){
+    t_tuile inter = laby[ligne][max];
+
+    /* Mise à jour d'une ligne du labyrinthe */
+    for (int i = max;i==min;i = i + plusmoins){
+        laby[ligne][i] = laby[ligne][i+plusmoins];
+    }
+
+    /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la ligne */
+    rotation(angle_rot,tuilesupp);
+    laby[ligne][min] = *tuilesupp;
+    *tuilesupp = inter;
+}
+
+void insertionColonne(int colonne,int max,int min,int plusmoins,int angle_rot,int tx,int ty,t_tuile laby[ty][tx],t_tuile * tuilesupp){
+    t_tuile inter = laby[max][colonne];
+
+    /* Mise à jour d'une colonne du labyrinthe */
+    for (int i = max;i == min;i = i + plusmoins){
+        laby[i][colonne] = laby[i+plusmoins][colonne];
+    }
+    
+    /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la colonne */
+    rotation(angle_rot,tuilesupp);
+    laby[min][colonne] = *tuilesupp;
+    *tuilesupp = inter;
+}
+
 void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile laby[ty][tx],int num_joueur){
     t_tuile inter;
     
     /* Modification du labyrinthe selon la tuile insérée et le côté choisi et modif de la position des joueurs*/
     /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des lignes vers la droite */
     if (mouvement.insert == 0){
-        /* Mise à jour d'une colonne du labyrinthe */
-        inter = laby[mouvement.number][tx-1];
-        for (int i = tx-1;i > 0; i--){
-            laby[mouvement.number][i] = laby[mouvement.number][i-1];
-        }
-
-        /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la ligne */
-        rotation(mouvement.rotation,&donnees->tuile_supplementaire);
-        laby[mouvement.number][0] = donnees->tuile_supplementaire;
-        donnees->tuile_supplementaire = inter;
+        /* Insertion de la tuile dans la ligne */
+        insertionLigne(mouvement.number,tx-1,0,-1,mouvement.rotation,tx,ty,laby,&donnees->tuile_supplementaire);
 
         /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
         if (donnees->joueur1.y == mouvement.number){
@@ -140,16 +160,8 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
 
     /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des lignes vers la gauche */
     else if (mouvement.insert == 1){
-        /* Mise à jour d'une ligne du labyrinthe */
-        inter = laby[mouvement.number][0];
-        for (int i = 0;i < tx-1; i++){
-            laby[mouvement.number][i] = laby[mouvement.number][i+1];
-        }
-
-        /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la ligne */
-        rotation(mouvement.rotation,&donnees->tuile_supplementaire);
-        laby[mouvement.number][tx-1] = donnees->tuile_supplementaire;
-        donnees->tuile_supplementaire = inter;
+        /* Insertion de la tuile dans la ligne */
+        insertionLigne(mouvement.number,0,tx-1,1,mouvement.rotation,tx,ty,laby,&donnees->tuile_supplementaire);
 
         /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
         if (donnees->joueur1.y == mouvement.number){
@@ -173,15 +185,7 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
     /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des colonnes vers le bas */
     else if (mouvement.insert == 2){
         /* Mise à jour d'une colonne du labyrinthe */
-        inter = laby[ty-1][mouvement.number];
-        for (int i = ty-1;i > 0; i--){
-            laby[i][mouvement.number] = laby[i-1][mouvement.number];
-        }
-
-        /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la colonne */
-        rotation(mouvement.rotation,&donnees->tuile_supplementaire);
-        laby[0][mouvement.number] = donnees->tuile_supplementaire;
-        donnees->tuile_supplementaire = inter;
+        insertionColonne(mouvement.number,ty-1,0,-1,mouvement.rotation,tx,ty,laby,&donnees->tuile_supplementaire);
 
         /* Mise à jour des position des joueurs au cas où ils soient sur la colonne modifiée */
         if (donnees->joueur1.x == mouvement.number){
@@ -205,15 +209,7 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
     /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des colonnes vers le haut */
     else if (mouvement.insert == 3){
         /* Mise à jour d'une colonne du labyrinthe */
-        inter = laby[0][mouvement.number];
-        for (int i = 0;i < ty-1; i++){
-            laby[i][mouvement.number] = laby[i+1][mouvement.number];
-        }
-
-        /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la colonne*/
-        rotation(mouvement.rotation,&donnees->tuile_supplementaire);
-        laby[ty-1][mouvement.number] = donnees->tuile_supplementaire;
-        donnees->tuile_supplementaire = inter;
+        insertionColonne(mouvement.number,0,ty-1,1,mouvement.rotation,tx,ty,laby,&donnees->tuile_supplementaire);
 
         /* Mise à jour des position des joueurs au cas où ils soient sur la colonne modifiée */
         if (donnees->joueur1.x == mouvement.number){
@@ -249,8 +245,32 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
     }
 }
 
-void coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx]){
-    
+int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx]){
+    /* Déclaration des variables (intermédiaire pour la plupart) */
+    t_tuile tuile_suppinter = donnees.tuile_supplementaire;
+    t_tuile labinter[ty][tx];
+    t_tuile inter;
+    int coordIi,coordIj;
+
+    /* Copie du labyrinthe et récupération des coordonnées du trésor à trouver */
+    for (int i = 0;i < ty;i++){
+        for (int j = 0;j < tx;j++){
+            labinter[i][j] = laby[i][j];
+            if (mouvement->nextItem == laby[i][j].tileI){
+                coordIi = i;
+                coordIj = j;
+            }
+        }
+    }
+
+    /* Cas où insert = 0 et 1 */
+    for (int i = 1;i < ty;i = i + 2){
+        for (int k = 0;k < 4;k++){
+            rotation(k,&tuile_suppinter);
+
+        }
+    }
+    return 0;
 }
 
 int main(void){
