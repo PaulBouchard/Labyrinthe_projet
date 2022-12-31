@@ -59,7 +59,7 @@ void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_
     donnees->tuile_supplementaire.tileW = case_O;
     donnees->tuile_supplementaire.tileI = case_I;
 
-    /* Remplissage du labyrinthe via un intermédiaire */
+    /* Remplissage du tableau labyrinthe via une liste intermédiaire */
     t_tuile * labyrinthe_inter = malloc(5*tx*ty*sizeof(int));
     int j = 0;
     for (int i = 0;i < 5*tx*ty;i = i+5){
@@ -78,21 +78,24 @@ void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_
             n=0;
             m=m+1;
         }
-        look[m][n].tileN = labyrinthe_inter[k].tileN;
+        /*look[m][n].tileN = labyrinthe_inter[k].tileN;
         look[m][n].tileE = labyrinthe_inter[k].tileE;
         look[m][n].tileS = labyrinthe_inter[k].tileS;
         look[m][n].tileW = labyrinthe_inter[k].tileW;
-        look[m][n].tileI = labyrinthe_inter[k].tileI;
+        look[m][n].tileI = labyrinthe_inter[k].tileI;*/
+        look[m][n] = labyrinthe_inter[k];
         n=n+1;
     }
 }
 
 int rotation(int angle,t_tuile *tile){
-    int inter = tile->tileN;    // valeur intermédiaire pour le changement de valeurs lors de la rotation
+    int inter = tile->tileN;
+    
     /* Condition d'arrêt */
     if (angle == 0){
         return 0;
     }
+    
     /* changement des valeurs pour une rotation de 90 degrés */
     else{
         tile->tileN = tile->tileW;
@@ -101,19 +104,22 @@ int rotation(int angle,t_tuile *tile){
         tile->tileE = inter;
         rotation(angle-1,tile); // Appel récursif pour si la rotation est >= 90 degrés
     }
-    return 0;
+    return 0;   // Au cas où
 }
 
 void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile laby[ty][tx],int num_joueur){
     t_tuile inter;
     
-    /* Modification du labyrinthe selon la tuile insérée et le côté choisi ainsi que de la position des joueurs*/
+    /* Modification du labyrinthe selon la tuile insérée et le côté choisi et modif de la position des joueurs*/
+    /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des lignes vers la droite */
     if (mouvement.insert == 0){
-        /* Modif de la ligne en "poussant" les tuiles vers ma droite */
+        /* Mise à jour d'une colonne du labyrinthe */
         inter = laby[mouvement.number][tx-1];
         for (int i = tx-1;i > 0; i--){
             laby[mouvement.number][i] = laby[mouvement.number][i-1];
         }
+
+        /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la ligne */
         rotation(mouvement.rotation,&donnees->tuile_supplementaire);
         laby[mouvement.number][0] = donnees->tuile_supplementaire;
         donnees->tuile_supplementaire = inter;
@@ -136,11 +142,16 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
             }
         }
     }
+
+    /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des lignes vers la gauche */
     else if (mouvement.insert == 1){
+        /* Mise à jour d'une ligne du labyrinthe */
         inter = laby[mouvement.number][0];
         for (int i = 0;i < tx-1; i++){
             laby[mouvement.number][i] = laby[mouvement.number][i+1];
         }
+
+        /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la ligne */
         rotation(mouvement.rotation,&donnees->tuile_supplementaire);
         laby[mouvement.number][tx-1] = donnees->tuile_supplementaire;
         donnees->tuile_supplementaire = inter;
@@ -163,16 +174,21 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
             }
         }
     }
+
+    /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des colonnes vers le bas */
     else if (mouvement.insert == 2){
+        /* Mise à jour d'une colonne du labyrinthe */
         inter = laby[ty-1][mouvement.number];
         for (int i = ty-1;i > 0; i--){
             laby[i][mouvement.number] = laby[i-1][mouvement.number];
         }
+
+        /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la colonne */
         rotation(mouvement.rotation,&donnees->tuile_supplementaire);
         laby[0][mouvement.number] = donnees->tuile_supplementaire;
         donnees->tuile_supplementaire = inter;
 
-        /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
+        /* Mise à jour des position des joueurs au cas où ils soient sur la colonne modifiée */
         if (donnees->joueur1.x == mouvement.number){
             if (donnees->joueur1.y == ty-1){
                 donnees->joueur1.y = 0;
@@ -190,16 +206,21 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
             }
         }
     }
+
+    /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des colonnes vers le haut */
     else if (mouvement.insert == 3){
+        /* Mise à jour d'une colonne du labyrinthe */
         inter = laby[0][mouvement.number];
         for (int i = 0;i < ty-1; i++){
             laby[i][mouvement.number] = laby[i+1][mouvement.number];
         }
+
+        /* Rotation de la tuile supplémentaire et ajout de cette dernière dans la colonne*/
         rotation(mouvement.rotation,&donnees->tuile_supplementaire);
         laby[ty-1][mouvement.number] = donnees->tuile_supplementaire;
         donnees->tuile_supplementaire = inter;
 
-        /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
+        /* Mise à jour des position des joueurs au cas où ils soient sur la colonne modifiée */
         if (donnees->joueur1.x == mouvement.number){
             if (donnees->joueur1.y == 0){
                 donnees->joueur1.y = ty-1;
@@ -262,6 +283,14 @@ int main(void){
     /* Initialisation du jeu avec les données de départ */
     t_tuile labyrinthe[tailleY][tailleX];
     init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);    
+
+    printLabyrinth();
+    for (int i=0;i<tailleY;i++){
+        for (int j=0;j<tailleX;j++){
+            printf("%d%d%d%d%d ",labyrinthe[i][j].tileN,labyrinthe[i][j].tileE,labyrinthe[i][j].tileS,labyrinthe[i][j].tileW,labyrinthe[i][j].tileI);
+        }
+        printf("\n");
+    }
 
     /* Début de partie */
     /*while (1){
