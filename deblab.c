@@ -78,11 +78,6 @@ void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_
             n=0;
             m=m+1;
         }
-        /*look[m][n].tileN = labyrinthe_inter[k].tileN;
-        look[m][n].tileE = labyrinthe_inter[k].tileE;
-        look[m][n].tileS = labyrinthe_inter[k].tileS;
-        look[m][n].tileW = labyrinthe_inter[k].tileW;
-        look[m][n].tileI = labyrinthe_inter[k].tileI;*/
         look[m][n] = labyrinthe_inter[k];
         n=n+1;
     }
@@ -243,31 +238,20 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
     if (num_joueur == 1){
         donnees->joueur2.x = mouvement.x;
         donnees->joueur2.y = mouvement.y;
-        
-        /* Si le joueur 2 se trouve sur la case qui contient le trésor qu'il doit trouver alors on augmente l'indice du trésor */
-        if (donnees->joueur2.nextI == laby[donnees->joueur2.y][donnees->joueur2.x].tileI){
-            donnees->joueur2.nextI = donnees->joueur2.nextI + 1;
-        }
-        else{
-            donnees->joueur2.nextI = mouvement.nextItem;
-        }
+        donnees->joueur2.nextI = mouvement.nextItem;
     }
 
     /* Récupération de la position et du prochain trésor du joueur 1 */
     if (num_joueur == 0){
         donnees->joueur1.x = mouvement.x;
         donnees->joueur1.y = mouvement.y;
-
-        /* Si le joueur 1 se trouve sur la case qui contient le trésor qu'il doit trouver alors on augmente l'indice du trésor */
-        if (donnees->joueur1.nextI == laby[donnees->joueur1.y][donnees->joueur1.x].tileI){
-            donnees->joueur1.nextI = donnees->joueur1.nextI + 1;
-        }
-        else{
-            donnees->joueur1.nextI = mouvement.nextItem;
-        }
+        donnees->joueur1.nextI = mouvement.nextItem;
     }
 }
 
+void coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx]){
+    
+}
 
 int main(void){
     /* Déclaration des variables */
@@ -279,7 +263,7 @@ int main(void){
 
     /* Connection au serveur et récupération des tailles */
     connectToServer("172.105.76.204",1234,"DONTMOVE");
-    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 seed=0xf653ce display=debug",nom_jeu,&tailleX,&tailleY);
+    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 seed=0xf653ce",nom_jeu,&tailleX,&tailleY);
     //printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
     
     /* Récupération du labyrinthe et de la case supplémentaire */
@@ -291,7 +275,7 @@ int main(void){
     init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);    
 
     /* Début de partie */
-    /*while (1){
+    while (1){
         
         if (numero_joueur_depart == 1){
             num_mouv_bot = getMove(&mouv_bot);
@@ -307,13 +291,13 @@ int main(void){
             
             demande_coup_joueur(&mouv_joueur);
             
-            //MaJDonnees(mouv_joueur,&donnees,tailleY,tailleX,laby,0);
-            
             num_mouv_joueur = sendMove(&mouv_joueur);
             
-            //MaJDonnees(mouv_bot,&donnees,tailleY,tailleX,laby,1);
+            MaJDonnees(mouv_joueur,&donnees,tailleY,tailleX,labyrinthe,0);
             
             num_mouv_bot = getMove(&mouv_bot);
+            
+            MaJDonnees(mouv_bot,&donnees,tailleY,tailleX,labyrinthe,1);
         }       
 
         if (num_mouv_joueur == 1){
@@ -337,7 +321,7 @@ int main(void){
             closeConnection();
             return 0;
         }   
-    }*/
+    }
     closeConnection();
     printf("AU REVOIR\n");
     return 0;
