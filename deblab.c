@@ -239,10 +239,12 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
         }
     }
     
-    /* Récupération des positions et du prochain trésor */
+    /* Récupération de la position et du prochain trésor du joueur 2 */
     if (num_joueur == 1){
         donnees->joueur2.x = mouvement.x;
         donnees->joueur2.y = mouvement.y;
+        
+        /* Si le joueur 2 se trouve sur la case qui contient le trésor qu'il doit trouver alors on augmente l'indice du trésor */
         if (donnees->joueur2.nextI == laby[donnees->joueur2.y][donnees->joueur2.x].tileI){
             donnees->joueur2.nextI = donnees->joueur2.nextI + 1;
         }
@@ -250,9 +252,13 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile la
             donnees->joueur2.nextI = mouvement.nextItem;
         }
     }
+
+    /* Récupération de la position et du prochain trésor du joueur 1 */
     if (num_joueur == 0){
         donnees->joueur1.x = mouvement.x;
         donnees->joueur1.y = mouvement.y;
+
+        /* Si le joueur 1 se trouve sur la case qui contient le trésor qu'il doit trouver alors on augmente l'indice du trésor */
         if (donnees->joueur1.nextI == laby[donnees->joueur1.y][donnees->joueur1.x].tileI){
             donnees->joueur1.nextI = donnees->joueur1.nextI + 1;
         }
@@ -283,14 +289,6 @@ int main(void){
     /* Initialisation du jeu avec les données de départ */
     t_tuile labyrinthe[tailleY][tailleX];
     init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);    
-
-    printLabyrinth();
-    for (int i=0;i<tailleY;i++){
-        for (int j=0;j<tailleX;j++){
-            printf("%d%d%d%d%d ",labyrinthe[i][j].tileN,labyrinthe[i][j].tileE,labyrinthe[i][j].tileS,labyrinthe[i][j].tileW,labyrinthe[i][j].tileI);
-        }
-        printf("\n");
-    }
 
     /* Début de partie */
     /*while (1){
