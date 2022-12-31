@@ -41,7 +41,7 @@ void demande_coup_joueur(t_move * mouvement){
     mouvement->insert = intermediaire_typenum;
 }
 
-void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile * labyrinthe,t_tuile look[ty][tx]){
+void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx]){
     /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
     donnees->joueur1.x = 0;
     donnees->joueur1.y = 0;
@@ -60,13 +60,14 @@ void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_
     donnees->tuile_supplementaire.tileI = case_I;
 
     /* Remplissage du labyrinthe via un intermédiaire */
+    t_tuile * labyrinthe_inter = malloc(5*tx*ty*sizeof(int));
     int j = 0;
     for (int i = 0;i < 5*tx*ty;i = i+5){
-        labyrinthe[j].tileN = lab[i];
-        labyrinthe[j].tileE = lab[i+1];
-        labyrinthe[j].tileS = lab[i+2];
-        labyrinthe[j].tileW = lab[i+3];
-        labyrinthe[j].tileI = lab[i+4];
+        labyrinthe_inter[j].tileN = lab[i];
+        labyrinthe_inter[j].tileE = lab[i+1];
+        labyrinthe_inter[j].tileS = lab[i+2];
+        labyrinthe_inter[j].tileW = lab[i+3];
+        labyrinthe_inter[j].tileI = lab[i+4];
         j = j + 1;
     }
 
@@ -77,11 +78,11 @@ void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_
             n=0;
             m=m+1;
         }
-        look[m][n].tileN = labyrinthe[k].tileN;
-        look[m][n].tileE = labyrinthe[k].tileE;
-        look[m][n].tileS = labyrinthe[k].tileS;
-        look[m][n].tileW = labyrinthe[k].tileW;
-        look[m][n].tileI = labyrinthe[k].tileI;
+        look[m][n].tileN = labyrinthe_inter[k].tileN;
+        look[m][n].tileE = labyrinthe_inter[k].tileE;
+        look[m][n].tileS = labyrinthe_inter[k].tileS;
+        look[m][n].tileW = labyrinthe_inter[k].tileW;
+        look[m][n].tileI = labyrinthe_inter[k].tileI;
         n=n+1;
     }
 }
@@ -247,32 +248,20 @@ int main(void){
     int tailleX,tailleY,case_N,case_E,case_S,case_O,case_I;
     char nom_jeu[50];
     t_move mouv_joueur,mouv_bot;
+    t_labyrinthe donnees;
 
-    /* Connection au serveur et récupération des données */
+    /* Connection au serveur et récupération des tailles */
     connectToServer("172.105.76.204",1234,"DONTMOVE");
     waitForLabyrinth("TRAINING DONTMOVE timeout=1000 seed=0xf653ce display=debug",nom_jeu,&tailleX,&tailleY);
+    //printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
     
+    /* Récupération du labyrinthe et de la case supplémentaire */
     int * lab = malloc(5*tailleX*tailleY*sizeof(int));
     numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
     
-    printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
-
-    t_tuile * labyrinthe_inter = malloc(5*tailleX*tailleY*sizeof(int));
-    
-    t_labyrinthe donnees;
-    t_tuile (*laby)[tailleX];
-    laby = malloc(sizeof(*laby)*tailleY);
-    laby = malloc(sizeof(int[tailleY][tailleX]));
-    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe_inter,laby);    
-    
-    printLabyrinth();
-    for (int i = 0;i<tailleY;i++){
-        for (int j = 0;j<tailleX;j++){
-            printf("%d%d%d%d%d ",laby[i][j].tileN,laby[i][j].tileE,laby[i][j].tileS,laby[i][j].tileW,laby[i][j].tileI);
-        }
-        printf("\n");
-    }
-    printf("%d",donnees.)
+    /* Initialisation du jeu avec les données de départ */
+    t_tuile labyrinthe[tailleY][tailleX];
+    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);    
 
     /* Début de partie */
     /*while (1){
