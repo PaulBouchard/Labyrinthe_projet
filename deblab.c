@@ -37,27 +37,27 @@ void demande_coup_joueur(t_move * mouvement){
     scanf("%d %d",&mouvement->x,&mouvement->y);*/
 
     printf("Coup -> ");
-    scanf("%d,%d,%d,%d %d",&intermediaire_typenum,&mouvement->number,&mouvement->rotation,&mouvement->x,&mouvement->y);
+    scanf("%d %d %d %d %d",&intermediaire_typenum,&mouvement->number,&mouvement->rotation,&mouvement->x,&mouvement->y);
     mouvement->insert = intermediaire_typenum;
 }
 
-void init_type(t_labyrinthe * laby,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile * labyrinthe,t_tuile look[ty][tx]){
+void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile * labyrinthe,t_tuile look[ty][tx]){
     /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
-    laby->joueur1.x = 0;
-    laby->joueur1.y = 0;
-    laby->joueur1.nextI = 1;
+    donnees->joueur1.x = 0;
+    donnees->joueur1.y = 0;
+    donnees->joueur1.nextI = 1;
 
     /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
-    laby->joueur2.x = tx - 1;
-    laby->joueur2.y = ty - 1;
-    laby->joueur2.nextI = 1;
+    donnees->joueur2.x = tx - 1;
+    donnees->joueur2.y = ty - 1;
+    donnees->joueur2.nextI = 1;
 
     /* Initialisation de la tuile supplémentaire */
-    laby->tuile_supplementaire.tileN = case_N;
-    laby->tuile_supplementaire.tileE = case_E;
-    laby->tuile_supplementaire.tileS = case_S;
-    laby->tuile_supplementaire.tileW = case_O;
-    laby->tuile_supplementaire.tileI = case_I;
+    donnees->tuile_supplementaire.tileN = case_N;
+    donnees->tuile_supplementaire.tileE = case_E;
+    donnees->tuile_supplementaire.tileS = case_S;
+    donnees->tuile_supplementaire.tileW = case_O;
+    donnees->tuile_supplementaire.tileI = case_I;
 
     /* Remplissage du labyrinthe via un intermédiaire */
     int j = 0;
@@ -103,57 +103,140 @@ int rotation(int angle,t_tuile *tile){
     return 0;
 }
 
-void MaJDonnees1(t_move mouvement,t_labyrinthe * donnees,t_tuile * laby[X][Y],int num_depart,int tx,int ty){
+void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int ty,int tx,t_tuile laby[ty][tx],int num_joueur){
     t_tuile inter;
     
-    /* Récupération des positions et du prochain trésor */
-    if (num_depart == 1){
-        donnees->joueur2.x = mouvement.x;
-        donnees->joueur2.y = mouvement.y;
-        donnees->joueur2.nextI = mouvement.nextItem;
-    }
-    if (num_depart == 0){
-        donnees->joueur1.x = mouvement.x;
-        donnees->joueur1.y = mouvement.y;
-        donnees->joueur1.nextI = mouvement.nextItem;
-    }
-
-    /* Modification du labyrinthe selon la tuile insérée et le côté choisi */
+    /* Modification du labyrinthe selon la tuile insérée et le côté choisi ainsi que de la position des joueurs*/
     if (mouvement.insert == 0){
-        inter = *laby[X-1][mouvement.number];
-        for (int i = X-1;i > 0; i--){
-            *laby[i][mouvement.number] = *laby[i-1][mouvement.number];
+        /* Modif de la ligne en "poussant" les tuiles vers ma droite */
+        inter = laby[mouvement.number][tx-1];
+        for (int i = tx-1;i > 0; i--){
+            laby[mouvement.number][i] = laby[mouvement.number][i-1];
         }
         rotation(mouvement.rotation,&donnees->tuile_supplementaire);
-        *laby[0][mouvement.number] = donnees->tuile_supplementaire;
+        laby[mouvement.number][0] = donnees->tuile_supplementaire;
         donnees->tuile_supplementaire = inter;
+
+        /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
+        if (donnees->joueur1.y == mouvement.number){
+            if (donnees->joueur1.x == tx-1){
+                donnees->joueur1.x = 0;
+            }
+            else{
+                donnees->joueur1.x = donnees->joueur1.x + 1;
+            }
+        }
+        if (donnees->joueur2.y == mouvement.number){
+            if (donnees->joueur2.x == tx-1){
+                donnees->joueur2.x = 0;
+            }
+            else{
+                donnees->joueur2.x = donnees->joueur2.x + 1;
+            }
+        }
     }
     else if (mouvement.insert == 1){
-        inter = *laby[0][mouvement.number];
-        for (int i = 0;i < X-1; i++){
-            *laby[i][mouvement.number] = *laby[i+1][mouvement.number];
+        inter = laby[mouvement.number][0];
+        for (int i = 0;i < tx-1; i++){
+            laby[mouvement.number][i] = laby[mouvement.number][i+1];
         }
         rotation(mouvement.rotation,&donnees->tuile_supplementaire);
-        *laby[X-1][mouvement.number] = donnees->tuile_supplementaire;
+        laby[mouvement.number][tx-1] = donnees->tuile_supplementaire;
         donnees->tuile_supplementaire = inter;
+
+        /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
+        if (donnees->joueur1.y == mouvement.number){
+            if (donnees->joueur1.x == 0){
+                donnees->joueur1.x = tx-1;
+            }
+            else{
+                donnees->joueur1.x = donnees->joueur1.x - 1;
+            }
+        }
+        if (donnees->joueur2.y == mouvement.number){
+            if (donnees->joueur2.x == 0){
+                donnees->joueur2.x = tx-1;
+            }
+            else{
+                donnees->joueur2.x = donnees->joueur2.x - 1;
+            }
+        }
     }
     else if (mouvement.insert == 2){
-        inter = *laby[mouvement.number][Y-1];
-        for (int i = Y-1;i > 0; i--){
-            *laby[mouvement.number][i] = *laby[mouvement.number][i-1];
+        inter = laby[ty-1][mouvement.number];
+        for (int i = ty-1;i > 0; i--){
+            laby[i][mouvement.number] = laby[i-1][mouvement.number];
         }
         rotation(mouvement.rotation,&donnees->tuile_supplementaire);
-        *laby[mouvement.number][0] = donnees->tuile_supplementaire;
+        laby[0][mouvement.number] = donnees->tuile_supplementaire;
         donnees->tuile_supplementaire = inter;
+
+        /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
+        if (donnees->joueur1.x == mouvement.number){
+            if (donnees->joueur1.y == ty-1){
+                donnees->joueur1.y = 0;
+            }
+            else{
+                donnees->joueur1.y = donnees->joueur1.y + 1;
+            }
+        }
+        if (donnees->joueur2.x == mouvement.number){
+            if (donnees->joueur2.y == ty-1){
+                donnees->joueur2.y = 0;
+            }
+            else{
+                donnees->joueur2.y = donnees->joueur2.y + 1;
+            }
+        }
     }
     else if (mouvement.insert == 3){
-        inter = *laby[mouvement.number][0];
-        for (int i = 0;i < Y-1; i++){
-            *laby[mouvement.number][i] = *laby[mouvement.number][i+1];
+        inter = laby[0][mouvement.number];
+        for (int i = 0;i < ty-1; i++){
+            laby[i][mouvement.number] = laby[i+1][mouvement.number];
         }
         rotation(mouvement.rotation,&donnees->tuile_supplementaire);
-        *laby[mouvement.number][Y-1] = donnees->tuile_supplementaire;
+        laby[ty-1][mouvement.number] = donnees->tuile_supplementaire;
         donnees->tuile_supplementaire = inter;
+
+        /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
+        if (donnees->joueur1.x == mouvement.number){
+            if (donnees->joueur1.y == 0){
+                donnees->joueur1.y = ty-1;
+            }
+            else{
+                donnees->joueur1.y = donnees->joueur1.y - 1;
+            }
+        }
+        if (donnees->joueur2.x == mouvement.number){
+            if (donnees->joueur2.y == 0){
+                donnees->joueur2.y = ty-1;
+            }
+            else{
+                donnees->joueur2.y = donnees->joueur2.y - 1;
+            }
+        }
+    }
+    
+    /* Récupération des positions et du prochain trésor */
+    if (num_joueur == 1){
+        donnees->joueur2.x = mouvement.x;
+        donnees->joueur2.y = mouvement.y;
+        if (donnees->joueur2.nextI == laby[donnees->joueur2.y][donnees->joueur2.x].tileI){
+            donnees->joueur2.nextI = donnees->joueur2.nextI + 1;
+        }
+        else{
+            donnees->joueur2.nextI = mouvement.nextItem;
+        }
+    }
+    if (num_joueur == 0){
+        donnees->joueur1.x = mouvement.x;
+        donnees->joueur1.y = mouvement.y;
+        if (donnees->joueur1.nextI == laby[donnees->joueur1.y][donnees->joueur1.x].tileI){
+            donnees->joueur1.nextI = donnees->joueur1.nextI + 1;
+        }
+        else{
+            donnees->joueur1.nextI = mouvement.nextItem;
+        }
     }
 }
 
@@ -167,23 +250,29 @@ int main(void){
 
     /* Connection au serveur et récupération des données */
     connectToServer("172.105.76.204",1234,"DONTMOVE");
-    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 seed=0xf653ce",nom_jeu,&tailleX,&tailleY);
+    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 seed=0xf653ce display=debug",nom_jeu,&tailleX,&tailleY);
     
     int * lab = malloc(5*tailleX*tailleY*sizeof(int));
     numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
     
-    t_tuile * labyrinthe = malloc(5*tailleX*tailleY*sizeof(int));
-    
     printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
-    
-    t_tuile (*look)[tailleX];
-    look = malloc(sizeof(*look)*tailleY);
-    look = malloc(sizeof(int[tailleY][tailleX]));
+
+    t_tuile * labyrinthe_inter = malloc(5*tailleX*tailleY*sizeof(int));
     
     t_labyrinthe donnees;
-    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe,look);    
-
+    t_tuile (*laby)[tailleX];
+    laby = malloc(sizeof(*laby)*tailleY);
+    laby = malloc(sizeof(int[tailleY][tailleX]));
+    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe_inter,laby);    
+    
     printLabyrinth();
+    for (int i = 0;i<tailleY;i++){
+        for (int j = 0;j<tailleX;j++){
+            printf("%d%d%d%d%d ",laby[i][j].tileN,laby[i][j].tileE,laby[i][j].tileS,laby[i][j].tileW,laby[i][j].tileI);
+        }
+        printf("\n");
+    }
+    printf("%d",donnees.)
 
     /* Début de partie */
     /*while (1){
@@ -191,19 +280,23 @@ int main(void){
         if (numero_joueur_depart == 1){
             num_mouv_bot = getMove(&mouv_bot);
             
+            printLabyrinth();
+            
             demande_coup_joueur(&mouv_joueur);
             
             num_mouv_joueur = sendMove(&mouv_joueur);
-
-            printLabyrinth();
         }
         else if(numero_joueur_depart == 0){
             printLabyrinth();
             
             demande_coup_joueur(&mouv_joueur);
             
+            //MaJDonnees(mouv_joueur,&donnees,tailleY,tailleX,laby,0);
+            
             num_mouv_joueur = sendMove(&mouv_joueur);
-
+            
+            //MaJDonnees(mouv_bot,&donnees,tailleY,tailleX,laby,1);
+            
             num_mouv_bot = getMove(&mouv_bot);
         }       
 
@@ -230,5 +323,6 @@ int main(void){
         }   
     }*/
     closeConnection();
+    printf("AU REVOIR\n");
     return 0;
 }
