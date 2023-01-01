@@ -287,7 +287,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
 
     /* Copie du labyrinthe et récupération des coordonnées du trésor à trouver */
     resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
-
+    printf("\n%d %d\n",arrivee[1],arrivee[0]);
     /* insert = 0 */
     for (int i = 1;i < ty;i = i + 2){
         /* Pour éviter de réinsérer la tuile qui vient d'être extraite */
@@ -307,7 +307,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             /* On change la position du joueur dans le cas où il soit sur la rangée modifiée et on ensuite on cherche un chemin */
             depart[1] = deplacementJoueur(donnees.joueur1.x,donnees.joueur1.y,i,1,tx-1,0);
             chemin = expansion(tx,ty,labinter,depart,arrivee);
-            
+            printf("\n%d %d\n",arrivee[1],arrivee[0]);
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
             if (chemin == -1){
                 mouvement->insert = 0;
@@ -328,6 +328,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                     autrcoup[4] = arrivee[1];
                 }
                 resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+                printf("\n%d %d\n",arrivee[1],arrivee[0]);
                 tuile_suppinter = donnees.tuile_supplementaire;
                 depart[1] = donnees.joueur1.x;
             }
@@ -353,7 +354,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             /* On change la position du joueur dans le cas où il soit sur la rangée modifiée et on ensuite on cherche un chemin */
             depart[1] = deplacementJoueur(donnees.joueur1.x,donnees.joueur1.y,i,-1,0,tx-1);
             chemin = expansion(tx,ty,labinter,depart,arrivee);
-
+            printf("\n%d %d\n",arrivee[1],arrivee[0]);
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
             if (chemin == -1){
                 mouvement->insert = 1;
@@ -374,6 +375,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                     autrcoup[4] = arrivee[1];
                 }
                 resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+                printf("\n%d %d\n",arrivee[1],arrivee[0]);
                 tuile_suppinter = donnees.tuile_supplementaire;
                 depart[1] = donnees.joueur1.x;
             }
@@ -399,6 +401,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             /* On change la position du joueur dans le cas où il soit sur la rangée modifiée et on ensuite on cherche un chemin */
             depart[0] = deplacementJoueur(donnees.joueur1.y,donnees.joueur1.x,i,1,ty-1,0);
             chemin = expansion(tx,ty,labinter,depart,arrivee);
+            printf("\n%d %d\n",arrivee[1],arrivee[0]);
             
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
             if (chemin == -1){
@@ -420,6 +423,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                     autrcoup[4] = arrivee[1];
                 }
                 resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+                printf("\n%d %d\n",arrivee[1],arrivee[0]);
                 tuile_suppinter = donnees.tuile_supplementaire;
                 depart[0] = donnees.joueur1.y;
             }
@@ -445,6 +449,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             /* On change la position du joueur dans le cas où il soit sur la rangée modifiée et on ensuite on cherche un chemin */
             depart[0] = deplacementJoueur(donnees.joueur1.y,donnees.joueur1.x,i,-1,0,ty-1);
             chemin = expansion(tx,ty,labinter,depart,arrivee);
+            printf("\n%d %d\n",arrivee[1],arrivee[0]);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
             if (chemin == -1){
@@ -466,6 +471,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                     autrcoup[4] = arrivee[1];
                 }
                 resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+                printf("\n%d %d\n",arrivee[1],arrivee[0]);
                 tuile_suppinter = donnees.tuile_supplementaire;
                 depart[0] = donnees.joueur1.y;
             }
@@ -491,7 +497,7 @@ int main(void){
 
     /* Connection au serveur et récupération des tailles */
     connectToServer("172.105.76.204",1234,"DONTMOVE");
-    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 seed=0xf653ce start=0",nom_jeu,&tailleX,&tailleY);
+    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 seed=0x72d4a2 start=0",nom_jeu,&tailleX,&tailleY);
     //printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
     
     /* Récupération du labyrinthe et de la case supplémentaire */
@@ -519,15 +525,14 @@ int main(void){
         else if(numero_joueur_depart == 0){
             printLabyrinth();
             //num = 0;
-            if ((mouv_joueur.nextItem == 7)||(mouv_joueur.nextItem == 24)){
+            /*if (mouv_joueur.nextItem == 7){
                 demande_coup_joueur(&mouv_joueur);
                 num_mouv_joueur = sendMove(&mouv_joueur);
-            }
-            else{
-                coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe);
-                printf("Moi -> [%d %d %d %d %d]\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
-                num_mouv_joueur = sendMove(&mouv_joueur);
-            }
+            }*/
+            
+            coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe);
+            printf("Moi -> [%d %d %d %d %d]\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
+            num_mouv_joueur = sendMove(&mouv_joueur);
             /*if (num == 1){
                 //printf("%d %d %d %d %d",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
                 num_mouv_joueur = sendMove(&mouv_joueur);
