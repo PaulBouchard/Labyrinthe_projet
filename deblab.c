@@ -213,15 +213,18 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             if (donnees.joueur1.nextI == laby[i][j].tileI){
                 coordIi = i;
                 coordIj = j;
+                continue;
             }
+            labinter[i][j].tileI = 0;
         }
     }
-    laby[coordIi][coordIj].tileI = -1;
+    labinter[coordIi][coordIj].tileI = -1;
 
     /* Cas où insert = 0 et 1 */
     for (int i = 1;i < ty;i = i + 2){
         for (int k = 0;k < 4;k++){
             insertionLigne(i,tx-1,0,-1,k,tx,ty,labinter,&tuile_suppinter);
+            donnees->joueur1.x = deplacementJoueur(donnees->joueur1.x,donnees->joueur1.y,mouvement.number,1,tx-1,0);
             chemin = expansion();
             if (chemin ==)
         }
@@ -229,7 +232,27 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     return 0;
 }
 
-int expansion(int tx,int ty,t_tuile laby[ty][tx])
+int expansion(int tx,int ty,t_tuile laby[ty][tx],t_labyrinthe donnees){
+    /* Déclaration des variables (intermédiaire pour la plupart) */
+    t_tuile tuile_suppinter = donnees.tuile_supplementaire;
+    t_tuile labinter[ty][tx];
+    t_tuile inter;
+    int arrivee[2];
+
+    /* Copie du labyrinthe et récupération des coordonnées du trésor à trouver */
+    for (int i = 0;i < ty;i++){
+        for (int j = 0;j < tx;j++){
+            labinter[i][j] = laby[i][j];
+            if (donnees.joueur1.nextI == laby[i][j].tileI){
+                arrivee[0] = i;
+                arrivee[1] = j;
+                continue;
+            }
+            labinter[i][j].tileI = 0;
+        }
+    }
+    labinter[arrivee[0]][arrivee[1]].tileI = -1;
+}
 
 int main(void){
     /* Déclaration des variables */
