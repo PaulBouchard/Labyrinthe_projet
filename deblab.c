@@ -238,7 +238,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
                             laby[i][j].tileI = r + 1;
                             parcours_case = parcours_case + 1;
                         }
-                        if ((laby[i][j-1].tileI == r) && (j>0) && (laby[i][j].tileW == 0) && (laby[i][j+1].tileE == 0)){
+                        if ((laby[i][j-1].tileI == r) && (j>0) && (laby[i][j].tileW == 0) && (laby[i][j-1].tileE == 0)){
                             laby[i][j].tileI = r + 1;
                             parcours_case = parcours_case + 1;
                         }
@@ -425,13 +425,12 @@ int main(void){
     int depart[2] = {donnees.joueur1.y,donnees.joueur1.x};
     int arrivee[2];
     resetLabyrinth(tailleX,tailleY,labinter,labyrinthe,arrivee,donnees.joueur1.nextI);
-    printf("\narrivee = %d %d\n",arrivee[0],arrivee[0]);
-    for (int i = 0;i < tailleY;i++){
+    /*for (int i = 0;i < tailleY;i++){
         for (int j = 0;j < tailleX;j++){
             printf("%d%d%d%d%d ",labinter[i][j].tileN,labinter[i][j].tileE,labinter[i][j].tileS,labinter[i][j].tileW,labinter[i][j].tileI);
         }
         printf("\n");
-    }
+    }*/
     /*insertion colonne 7 */
     t_tuile inter = labinter[tailleY-1][7];
     for (int i = tailleY-1;i>0;i--){
@@ -441,8 +440,8 @@ int main(void){
     labinter[0][7] = tuile_suppinter;
     tuile_suppinter = inter;
 
-    printf("\n\ntuile nouvelle = [%d%d%d%d%d]\n",tuile_suppinter.tileN,tuile_suppinter.tileE,tuile_suppinter.tileS,tuile_suppinter.tileW,tuile_suppinter.tileI);
-    
+    //printf("\n\ntuile nouvelle = [%d%d%d%d%d]\n",tuile_suppinter.tileN,tuile_suppinter.tileE,tuile_suppinter.tileS,tuile_suppinter.tileW,tuile_suppinter.tileI);
+    int num = expansion(tailleX,tailleY,labinter,depart,arrivee);
     for (int i = 0;i < tailleY;i++){
         for (int j = 0;j < tailleX;j++){
             printf("%d%d%d%d%d ",labinter[i][j].tileN,labinter[i][j].tileE,labinter[i][j].tileS,labinter[i][j].tileW,labinter[i][j].tileI);
@@ -451,7 +450,7 @@ int main(void){
     }
 
     
-    int num = expansion(tailleX,tailleY,labinter,depart,arrivee);
+    
     
     if (num == 1){
         printf("REUSSIE");
