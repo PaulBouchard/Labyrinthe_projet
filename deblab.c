@@ -204,7 +204,7 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile la
     }
 
     donnees->last_insert = mouvement.insert;
-    donnees->last_number = mouvement.insert;
+    donnees->last_number = mouvement.number;
 }
 
 void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[ty][tx],int arrivee[2],int tresor){
@@ -225,7 +225,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
     laby[depart[0]][depart[1]].tileI = r;
     int parcours_case = 0;
     laby[arrivee[0]][arrivee[1]].tileI = 0;
-
+    int max = 0;
 
     while (laby[arrivee[0]][arrivee[1]].tileI == 0){
         for (int i = 0;i < ty; i++){
@@ -256,14 +256,23 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
             }
         }
         if (parcours_case == 0){
-            return 0;
+            for (int i = 0;i < ty;i++){
+                for (int j = 0;j < tx;j++){
+                    if (laby[i][j].tileI >= max){
+                        max = laby[i][j].tileI;
+                        arrivee[0] = i;
+                        arrivee[1] = j;
+                    }
+                }
+            }
+            return max;
         }
         else{
             parcours_case = 0;
             r = r + 1;
         }
     }
-    return 1;
+    return -1;
 }
 
 int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx]){
@@ -273,7 +282,8 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     t_tuile labinter[ty][tx];
     int depart[2] = {donnees.joueur1.y,donnees.joueur1.x};
     int arrivee[2];
-    int chemin;
+    int chemin,maxdist = 0;
+    int autrcoup[5];
 
     /* Copie du labyrinthe et récupération des coordonnées du trésor à trouver */
     resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
@@ -299,7 +309,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             chemin = expansion(tx,ty,labinter,depart,arrivee);
             
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
-            if (chemin == 1){
+            if (chemin == -1){
                 mouvement->insert = 0;
                 mouvement->number = i;
                 mouvement->rotation = k;
@@ -309,6 +319,14 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
             /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
             else{
+                if (maxdist <= chemin){
+                    maxdist = chemin;
+                    autrcoup[0] = 0;
+                    autrcoup[1] = i;
+                    autrcoup[2] = k;
+                    autrcoup[3] = arrivee[0];
+                    autrcoup[4] = arrivee[1];
+                }
                 resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
                 tuile_suppinter = donnees.tuile_supplementaire;
                 depart[1] = donnees.joueur1.x;
@@ -337,7 +355,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             chemin = expansion(tx,ty,labinter,depart,arrivee);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
-            if (chemin == 1){
+            if (chemin == -1){
                 mouvement->insert = 1;
                 mouvement->number = i;
                 mouvement->rotation = k;
@@ -347,6 +365,14 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
             /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
             else{
+                if (maxdist <= chemin){
+                    maxdist = chemin;
+                    autrcoup[0] = 1;
+                    autrcoup[1] = i;
+                    autrcoup[2] = k;
+                    autrcoup[3] = arrivee[0];
+                    autrcoup[4] = arrivee[1];
+                }
                 resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
                 tuile_suppinter = donnees.tuile_supplementaire;
                 depart[1] = donnees.joueur1.x;
@@ -375,7 +401,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             chemin = expansion(tx,ty,labinter,depart,arrivee);
             
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
-            if (chemin == 1){
+            if (chemin == -1){
                 mouvement->insert = 2;
                 mouvement->number = i;
                 mouvement->rotation = k;
@@ -385,6 +411,14 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
             /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
             else{
+                if (maxdist <= chemin){
+                    maxdist = chemin;
+                    autrcoup[0] = 2;
+                    autrcoup[1] = i;
+                    autrcoup[2] = k;
+                    autrcoup[3] = arrivee[0];
+                    autrcoup[4] = arrivee[1];
+                }
                 resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
                 tuile_suppinter = donnees.tuile_supplementaire;
                 depart[0] = donnees.joueur1.y;
@@ -413,7 +447,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             chemin = expansion(tx,ty,labinter,depart,arrivee);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
-            if (chemin == 1){
+            if (chemin == -1){
                 mouvement->insert = 3;
                 mouvement->number = i;
                 mouvement->rotation = k;
@@ -423,6 +457,14 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
             /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
             else{
+                if (maxdist <= chemin){
+                    maxdist = chemin;
+                    autrcoup[0] = 3;
+                    autrcoup[1] = i;
+                    autrcoup[2] = k;
+                    autrcoup[3] = arrivee[0];
+                    autrcoup[4] = arrivee[1];
+                }
                 resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
                 tuile_suppinter = donnees.tuile_supplementaire;
                 depart[0] = donnees.joueur1.y;
@@ -430,6 +472,11 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             
         }
     }
+    mouvement->insert = autrcoup[0];
+    mouvement->number = autrcoup[1];
+    mouvement->rotation = autrcoup[2];
+    mouvement->x = autrcoup[4];
+    mouvement->y = autrcoup[3];
     return 0;
 }
 
@@ -471,21 +518,34 @@ int main(void){
 
         else if(numero_joueur_depart == 0){
             printLabyrinth();
-            num = coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe);
-            if (num == 1){
+            //num = 0;
+            if ((mouv_joueur.nextItem == 7)||(mouv_joueur.nextItem == 24)){
+                demande_coup_joueur(&mouv_joueur);
+                num_mouv_joueur = sendMove(&mouv_joueur);
+            }
+            else{
+                coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe);
+                printf("Moi -> [%d %d %d %d %d]\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
+                num_mouv_joueur = sendMove(&mouv_joueur);
+            }
+            /*if (num == 1){
                 //printf("%d %d %d %d %d",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
                 num_mouv_joueur = sendMove(&mouv_joueur);
             }
             else{
                 demande_coup_joueur(&mouv_joueur);
                 num_mouv_joueur = sendMove(&mouv_joueur);
-            }
-            
+            }*/
+            printf("insert et number -> %d %d\n",donnees.last_insert,donnees.last_number);
             MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0);
+            printf("insert et number -> %d %d\n\n",donnees.last_insert,donnees.last_number);
+            
             
             num_mouv_bot = getMove(&mouv_bot);
-            
+            printf("Bot -> [%d %d %d %d %d]\n",mouv_bot.insert,mouv_bot.number,mouv_bot.rotation,mouv_bot.x,mouv_bot.y);
+            printf("insert et number -> %d %d\n",donnees.last_insert,donnees.last_number);
             MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1);
+            printf("insert et number -> %d %d\n\n",donnees.last_insert,donnees.last_number);
         }       
 
         if (num_mouv_joueur == 1){
