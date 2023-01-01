@@ -206,18 +206,17 @@ void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[t
                 arrivee[0] = i;
                 arrivee[1] = j;
             }
-            printf("%d%d%d%d%d ",labareset[i][j].tileN,labareset[i][j].tileE,labareset[i][j].tileS,labareset[i][j].tileW,labareset[i][j].tileI);
             labareset[i][j].tileI = 0;
         }
-        printf("\n");
     }
-    printf("\n\n\n");
 }
 
 int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
     int r = 1;
     laby[depart[0]][depart[1]].tileI = r;
     int parcours_case = 0;
+    laby[arrivee[0]][arrivee[1]].tileI = 0;
+
 
     while (laby[arrivee[0]][arrivee[1]].tileI == 0){
         for (int i = 0;i < ty; i++){
@@ -417,29 +416,33 @@ int main(void){
     t_tuile labyrinthe[tailleY][tailleX];
     init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);    
     
-    int num;
-    /*t_tuile tuile_suppinter = donnees.tuile_supplementaire;
-    printf("tuile originale = [%d%d%d%d%d]\n",tuile_suppinter.tileN,tuile_suppinter.tileE,tuile_suppinter.tileS,tuile_suppinter.tileW,tuile_suppinter.tileI);
+    printLabyrinth();
+
+    t_tuile tuile_suppinter = donnees.tuile_supplementaire;
     t_tuile labinter[tailleY][tailleX];
 
-    int depart[2];
-    depart[0] = donnees.joueur1.y;
-    depart[1] = donnees.joueur1.x;
+    
+    int depart[2] = {donnees.joueur1.y,donnees.joueur1.x};
     int arrivee[2];
     resetLabyrinth(tailleX,tailleY,labinter,labyrinthe,arrivee,donnees.joueur1.nextI);
-    
-    
-    insertion colonne 7 
+    printf("\narrivee = %d %d\n",arrivee[0],arrivee[0]);
+    for (int i = 0;i < tailleY;i++){
+        for (int j = 0;j < tailleX;j++){
+            printf("%d%d%d%d%d ",labinter[i][j].tileN,labinter[i][j].tileE,labinter[i][j].tileS,labinter[i][j].tileW,labinter[i][j].tileI);
+        }
+        printf("\n");
+    }
+    /*insertion colonne 7 */
     t_tuile inter = labinter[tailleY-1][7];
     for (int i = tailleY-1;i>0;i--){
         labinter[i][7] = labinter[i-1][7];
     }
-    rotation(0,&tuile_suppinter);
+    rotation(1,&tuile_suppinter);
     labinter[0][7] = tuile_suppinter;
     tuile_suppinter = inter;
 
-
     printf("\n\ntuile nouvelle = [%d%d%d%d%d]\n",tuile_suppinter.tileN,tuile_suppinter.tileE,tuile_suppinter.tileS,tuile_suppinter.tileW,tuile_suppinter.tileI);
+    
     for (int i = 0;i < tailleY;i++){
         for (int j = 0;j < tailleX;j++){
             printf("%d%d%d%d%d ",labinter[i][j].tileN,labinter[i][j].tileE,labinter[i][j].tileS,labinter[i][j].tileW,labinter[i][j].tileI);
@@ -448,16 +451,16 @@ int main(void){
     }
 
     
+    int num = expansion(tailleX,tailleY,labinter,depart,arrivee);
     
-    
-    num = expansion(tailleX,tailleY,labinter,depart,arrivee);
     if (num == 1){
         printf("REUSSIE");
     }
     else{
-        printf("MINCE");
-    }*/
+        printf("MINCE\n");
+    }
     /* Début de partie */
+    /*
     while (1){
         
         if (numero_joueur_depart == 1){
@@ -471,10 +474,9 @@ int main(void){
         }
         else if(numero_joueur_depart == 0){
             printLabyrinth();
-            //num = coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe);
-            printf("%d %d %d %d %d\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
+            coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe);
             
-            demande_coup_joueur(&mouv_joueur);
+            //demande_coup_joueur(&mouv_joueur);
             
             num_mouv_joueur = sendMove(&mouv_joueur);
             
@@ -507,6 +509,7 @@ int main(void){
             return 0;
         }   
     }
+    */
     closeConnection();
     printf("AU REVOIR\n");
     return 0;
