@@ -232,6 +232,8 @@ void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[t
 
 int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
     int r = 1;
+    int indice = 1;
+    int max = 0;
     laby[depart[0]][depart[1]].tileI = r;
     int parcours_case = 0;
     laby[arrivee[0]][arrivee[1]].tileI = 0;
@@ -265,6 +267,47 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
             }
         }
         if (parcours_case == 0){
+            while (max == 0){
+                for (int i = -indice;i <= indice;i++){
+                    if ((arrivee[0] == 0) && (i < 0)){
+                        continue;
+                    }
+                    if (arrivee[0]+i < 0){
+                        continue;
+                    }
+                    if (arrivee[0]+i > ty-1){
+                        continue;
+                    }
+                    if ((arrivee[0] == ty-1) && (i > ty-1)){
+                        continue;
+                    }
+                    for (int j = -indice;j <= indice;j++){
+                        if ((arrivee[1] == 0) && (j < 0)){
+                            continue;
+                        }
+                        if (arrivee[1]+j < 0){
+                            continue;
+                        }
+                        if (arrivee[1]+j > tx-1){
+                            continue;
+                        }
+                        if ((arrivee[1] == tx-1) && (j > tx-1)){
+                            continue;
+                        }
+                        if ((arrivee[0] == 0) && (arrivee[1] == 0)){
+                            continue;
+                        }
+                        if (laby[arrivee[0]+i][arrivee[1]+j].tileI != 0){
+                            max = laby[arrivee[0]+i][arrivee[1]+j].tileI;
+                            arrivee[0] = arrivee[0]+i;
+                            arrivee[1] = arrivee[1]+j;
+                            return 1;
+                        }
+                    }
+                }
+                indice = indice + 1;
+            }
+
             for (int i = 0;i < ty;i++){
                 for (int j = 0;j < tx;j++){
                     if (laby[i][j].tileI == r){
@@ -291,17 +334,6 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     int depart[2] = {donnees.joueur1.y,donnees.joueur1.x};
     int arrivee[2];
     int chemin,maxdist = 0;
-
-    /* Copie du labyrinthe et récupération des coordonnées du trésor à trouver */
-    /*resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
-    for (int i = 0;i < ty;i++){
-        for (int j = 0;j < tx;j++){
-            printf("%d%d%d%d%d ",labinter[i][j].tileN,labinter[i][j].tileE,labinter[i][j].tileS,labinter[i][j].tileW,labinter[i][j].tileI);
-        }
-        printf("\n");
-    }
-    printf("\n\n");
-    printf("\n%d %d\n",arrivee[1],arrivee[0]);*/
 
     /* insert = 0 */
     for (int i = 1;i < ty;i = i + 2){
@@ -513,11 +545,9 @@ int main(void){
 
     /* Connection au serveur et récupération des tailles */
     connectToServer("172.105.76.204",1234,"Paul");
-    waitForLabyrinth("TRAINING BASIC timeout=1000 seed=0x7e6153",nom_jeu,&tailleX,&tailleY);
+    waitForLabyrinth("TRAINING BASIC timeout=1000",nom_jeu,&tailleX,&tailleY);
     printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
     
-    //seed=0x23f2c6
-
     /* Récupération du labyrinthe et de la case supplémentaire */
     int * lab = malloc(5*tailleX*tailleY*sizeof(int));
     numero_joueur_depart = getLabyrinth(lab,&case_N,&case_E,&case_S,&case_O,&case_I);
