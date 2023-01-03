@@ -303,6 +303,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
+            depart[0] = donnees.joueur1.y;
             depart[1] = donnees.joueur1.x;
 
             /* On décale toutes les tuiles d'une ligne en insérant la tuile supplémentaire rotationnée */
@@ -351,6 +352,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
+            depart[0] = donnees.joueur1.y;
             depart[1] = donnees.joueur1.x;
         
             /* On décale toutes les tuiles d'une ligne en insérant la tuile supplémentaire rotationnée */
@@ -400,6 +402,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
             depart[0] = donnees.joueur1.y;
+            depart[1] = donnees.joueur1.x;
 
             /* On décale toutes les tuiles d'une ligne en insérant la tuile supplémentaire rotationnée */
             inter = labinter[ty-1][i];
@@ -448,6 +451,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
             depart[0] = donnees.joueur1.y;
+            depart[1] = donnees.joueur1.x;
 
             /* On décale toutes les tuiles d'une ligne en insérant la tuile supplémentaire rotationnée */
             inter = labinter[0][i];
@@ -496,11 +500,11 @@ int main(void){
     t_labyrinthe donnees;
 
     /* Connection au serveur et récupération des tailles */
-    connectToServer("172.105.76.204",1234,"DONTMOVE");
-    waitForLabyrinth("TRAINING DONTMOVE timeout=1000 start=0",nom_jeu,&tailleX,&tailleY);
+    connectToServer("172.105.76.204",1234,"Paul");
+    waitForLabyrinth("TRAINING RANDOM timeout=1000 start=0",nom_jeu,&tailleX,&tailleY);
     printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
     
-    // seed=0x23f2c6
+    //seed=0x23f2c6
 
     /* Récupération du labyrinthe et de la case supplémentaire */
     int * lab = malloc(5*tailleX*tailleY*sizeof(int));
