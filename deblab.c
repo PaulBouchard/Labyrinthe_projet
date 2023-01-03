@@ -268,12 +268,6 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
             r = r + 1;
         }
     }
-    for (int i = 0;i < ty;i++){
-        for (int j = 0;j < tx;j++){
-            printf("%d%d%d%d%d ",laby[i][j].tileN,laby[i][j].tileE,laby[i][j].tileS,laby[i][j].tileW,laby[i][j].tileI);
-        }
-        printf("\n");
-    }
     return -1;
 }
 
@@ -294,6 +288,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         }
         printf("\n");
     }
+    printf("\n\n");
     printf("\n%d %d\n",arrivee[1],arrivee[0]);*/
 
     /* insert = 0 */
@@ -306,8 +301,8 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
 
         for (int k = 0;k < 4;k++){
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
-            printf("[%d %d]",arrivee[0],arrivee[1]);
             tuile_suppinter = donnees.tuile_supplementaire;
+            tuile_suppinter.tileI = 0;
             depart[1] = donnees.joueur1.x;
 
             /* On décale toutes les tuiles d'une ligne en insérant la tuile supplémentaire rotationnée */
@@ -355,6 +350,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         for (int k = 0;k < 4;k++){
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
             tuile_suppinter = donnees.tuile_supplementaire;
+            tuile_suppinter.tileI = 0;
             depart[1] = donnees.joueur1.x;
         
             /* On décale toutes les tuiles d'une ligne en insérant la tuile supplémentaire rotationnée */
@@ -402,6 +398,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         for (int k = 0;k<4;k++){
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
             tuile_suppinter = donnees.tuile_supplementaire;
+            tuile_suppinter.tileI = 0;
             depart[0] = donnees.joueur1.y;
 
             /* On décale toutes les tuiles d'une ligne en insérant la tuile supplémentaire rotationnée */
@@ -449,6 +446,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         for (int k = 0;k<4;k++){
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
             tuile_suppinter = donnees.tuile_supplementaire;
+            tuile_suppinter.tileI = 0;
             depart[0] = donnees.joueur1.y;
 
             /* On décale toutes les tuiles d'une ligne en insérant la tuile supplémentaire rotationnée */
@@ -513,7 +511,7 @@ int main(void){
     init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);    
     
     /* Début de partie */
-    /*while (1){
+    while (1){
         printLabyrinth();
         
         coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot);
@@ -546,7 +544,7 @@ int main(void){
             closeConnection();
             return 0;
         }   
-    }*/
+    }
     closeConnection();
     printf("AU REVOIR\n");
     return 0;
