@@ -501,7 +501,7 @@ int main(void){
 
     /* Connection au serveur et récupération des tailles */
     connectToServer("172.105.76.204",1234,"Paul");
-    waitForLabyrinth("TRAINING RANDOM timeout=1000 start=0",nom_jeu,&tailleX,&tailleY);
+    waitForLabyrinth("TRAINING BASIC timeout=1000 start=0",nom_jeu,&tailleX,&tailleY);
     printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
     
     //seed=0x23f2c6
@@ -516,16 +516,35 @@ int main(void){
     
     /* Début de partie */
     while (1){
-        printLabyrinth();
+        if (numero_joueur_depart == 0){
+            printLabyrinth();
         
-        coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot);
-        num_mouv_joueur = sendMove(&mouv_joueur);
-        MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0);
-        printf("Moi -> [%d %d %d %d %d]\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
+            coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot);
+            num_mouv_joueur = sendMove(&mouv_joueur);
+            MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0);
+            
+            printf("Moi -> [%d %d %d %d %d]\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
+            
+            num_mouv_bot = getMove(&mouv_bot);
+            MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1);
+            
+            printf("Bot -> [%d %d %d %d %d]\n",mouv_bot.insert,mouv_bot.number,mouv_bot.rotation,mouv_bot.x,mouv_bot.y); 
+        }
         
-        num_mouv_bot = getMove(&mouv_bot);
-        MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1);
-        printf("Bot -> [%d %d %d %d %d]\n",mouv_bot.insert,mouv_bot.number,mouv_bot.rotation,mouv_bot.x,mouv_bot.y);
+        else if (numero_joueur_depart == 1){
+            num_mouv_bot = getMove(&mouv_bot);
+            MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1);
+
+            printf("Bot -> [%d %d %d %d %d]\n",mouv_bot.insert,mouv_bot.number,mouv_bot.rotation,mouv_bot.x,mouv_bot.y);
+
+            printLabyrinth();
+
+            coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot);
+            num_mouv_joueur = sendMove(&mouv_joueur);
+            MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0);
+            
+            printf("Moi -> [%d %d %d %d %d]\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
+        }
         
         if (num_mouv_joueur == 1){
             printf("Vous avez gagné");
