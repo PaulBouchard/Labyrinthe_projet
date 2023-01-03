@@ -32,7 +32,6 @@ void demande_coup_joueur(t_move * mouvement){
         
     printf("Entrez un chiffre entre 0 et 3 indiquant la rotation appliquée à la pièce en sens horaire\n");
     scanf("%d",&mouvement->rotation);
-
     printf("Entrez les coordonnées de la case où vous voulez aller (x y)\n");
     scanf("%d %d",&mouvement->x,&mouvement->y);*/
 
@@ -41,16 +40,29 @@ void demande_coup_joueur(t_move * mouvement){
     mouvement->insert = intermediaire_typenum;
 }
 
-void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx]){
-    /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
-    donnees->joueur1.x = 0;
-    donnees->joueur1.y = 0;
-    donnees->joueur1.nextI = 1;
+void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx],int premierJoueur){
+    if (premierJoueur == 0){
+        /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
+        donnees->joueur1.x = 0;
+        donnees->joueur1.y = 0;
+        donnees->joueur1.nextI = 1;
 
-    /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
-    donnees->joueur2.x = tx - 1;
-    donnees->joueur2.y = ty - 1;
-    donnees->joueur2.nextI = 1;
+        /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
+        donnees->joueur2.x = tx - 1;
+        donnees->joueur2.y = ty - 1;
+        donnees->joueur2.nextI = 24;
+    }
+    else if (premierJoueur == 1){
+        /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
+        donnees->joueur1.x = tx-1;
+        donnees->joueur1.y = ty-1;
+        donnees->joueur1.nextI = 24;
+
+        /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
+        donnees->joueur2.x = 0;
+        donnees->joueur2.y = 0;
+        donnees->joueur2.nextI = 1;
+    }
 
     /* Initialisation de la tuile supplémentaire */
     donnees->tuile_supplementaire.tileN = case_N;
@@ -501,7 +513,7 @@ int main(void){
 
     /* Connection au serveur et récupération des tailles */
     connectToServer("172.105.76.204",1234,"Paul");
-    waitForLabyrinth("TRAINING BASIC timeout=1000 start=0",nom_jeu,&tailleX,&tailleY);
+    waitForLabyrinth("TRAINING BASIC timeout=1000 seed=0x7e6153",nom_jeu,&tailleX,&tailleY);
     printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
     
     //seed=0x23f2c6
@@ -512,61 +524,81 @@ int main(void){
     
     /* Initialisation du jeu avec les données de départ */
     t_tuile labyrinthe[tailleY][tailleX];
-    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe);    
+    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe,numero_joueur_depart);    
     
     /* Début de partie */
     while (1){
+        /* Si c'est le joueur 1 qui commence */
         if (numero_joueur_depart == 0){
             printLabyrinth();
         
             coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot);
             num_mouv_joueur = sendMove(&mouv_joueur);
+            if (num_mouv_joueur != 0){
+                if (num_mouv_joueur == 1){
+                    printf("Vous avez gagné\n");
+                    closeConnection();
+                    return 0;
+                }
+                if (num_mouv_joueur == -1){
+                    printf("Vous avez perdu -> mouvement interdit\n");
+                    closeConnection();
+                    return 0;
+                }
+            }
             MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0);
-            
-            printf("Moi -> [%d %d %d %d %d]\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
-            
+                        
             num_mouv_bot = getMove(&mouv_bot);
+            if (num_mouv_bot != 0){
+                if (num_mouv_bot == 1){
+                    printf("Vous avez perdu\n");
+                    closeConnection();
+                    return 0;
+                }
+                if (num_mouv_bot == -1){
+                    printf("Vous avez gagné -> mouvement interdit du bot\n");
+                    closeConnection();
+                    return 0;
+                }
+            }
             MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1);
-            
-            printf("Bot -> [%d %d %d %d %d]\n",mouv_bot.insert,mouv_bot.number,mouv_bot.rotation,mouv_bot.x,mouv_bot.y); 
         }
         
         else if (numero_joueur_depart == 1){
+            
             num_mouv_bot = getMove(&mouv_bot);
+            if (num_mouv_bot != 0){
+                if (num_mouv_bot == 1){
+                    printf("Vous avez perdu\n");
+                    closeConnection();
+                    return 0;
+                }
+                if (num_mouv_bot == -1){
+                    printf("Vous avez gagné -> mouvement interdit du bot\n");
+                    closeConnection();
+                    return 0;
+                }
+            }
             MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1);
-
-            printf("Bot -> [%d %d %d %d %d]\n",mouv_bot.insert,mouv_bot.number,mouv_bot.rotation,mouv_bot.x,mouv_bot.y);
 
             printLabyrinth();
 
             coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot);
             num_mouv_joueur = sendMove(&mouv_joueur);
+            if (num_mouv_joueur != 0){
+                if (num_mouv_joueur == 1){
+                    printf("Vous avez gagné\n");
+                    closeConnection();
+                    return 0;
+                }
+                if (num_mouv_joueur == -1){
+                    printf("Vous avez perdu -> mouvement interdit\n");
+                    closeConnection();
+                    return 0;
+                }
+            }
             MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0);
-            
-            printf("Moi -> [%d %d %d %d %d]\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
         }
-        
-        if (num_mouv_joueur == 1){
-            printf("Vous avez gagné");
-            closeConnection();
-            return 0;
-        }
-        else if (num_mouv_joueur == -1){
-            printf("Vous avez fait un mouvement illégal, vous perdez, le bot gagne");
-            closeConnection();
-            return 0;
-        }
-
-        if (num_mouv_bot == 1){
-            printf("Vous avez perdu, le robot a gagné");
-            closeConnection();
-            return 0;
-        }
-        else if (num_mouv_bot == -1){
-            printf("Le robot a fait un mouvement illégal, vous gagnez, le bot perd");
-            closeConnection();
-            return 0;
-        }   
     }
     closeConnection();
     printf("AU REVOIR\n");
