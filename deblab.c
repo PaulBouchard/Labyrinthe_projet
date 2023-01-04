@@ -6,22 +6,40 @@
 #define X 10
 #define Y 10
 
+/* La position d'un joueur contient : 
+    - les coordonnées x et y du joueur
+    - l'indice du trésor qu'il doit trouver
+*/
 typedef struct{
     int x,y;
     int nextI;
 }t_position;
 
+/* Une tuile est définie par :
+    - la présence de mur sur ses côtés (1 = mur, 0 = libre)
+    - la présence d'un trésoren son centre (0 sil n'y en a pas, sinon l'indice du trésor)
+*/
 typedef struct{
     int tileN,tileS,tileW,tileE;
     int tileI;
 }t_tuile;
 
+/* Le labyrinthe est défini par :
+    - Les positions des deux joueurs
+    - La tuile supplémentaire
+*/
 typedef struct{
     t_position joueur1;
     t_position joueur2;
     t_tuile tuile_supplementaire;
 }t_labyrinthe;
 
+/* Fonction demande_coup_joueur
+* But: Demande les différents paramètres d'un coup au joueur et récupère ceux entrés
+* Paramètres : 
+*    - mouvement : le mouvement du joueur de type t_move
+* Retourne rien
+* Modifie les paramètres du mouvement */
 void demande_coup_joueur(t_move * mouvement){
     int intermediaire_typenum;
     /*printf("Entrez un chiffre entre 0 et 3 indiquant par quel côté la piece sera insérée (0=O,1=E,2=N,S=3)\n");
@@ -40,6 +58,17 @@ void demande_coup_joueur(t_move * mouvement){
     mouvement->insert = intermediaire_typenum;
 }
 
+/* Fonction init_type
+* But: Initialise les différentes données relatives au labyrinthe
+* Paramètres : 
+*    - donnees : données du labyrinthe qu'on va modifier dans la fonction (position des joueurs et tuile supplémentaire)
+*    - case_N,case_E,case_S,case_O,case_I : informations de la tuile supplémentaire
+*    - lab : liste contenant toutes les données relatives aux tuiles du labyrinthe
+*    - tx,ty : longueur et largeur du labyrinthe
+*    - look : tableau en 2D contenant les tuiles du labyrinthe (lab mais mieux organisé)
+*    - premierJoueur : valeur indiquant qui est le joueur qui débutera la partie
+* Retourne rien
+* Modifie donnees,look */
 void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx],int premierJoueur){
     if (premierJoueur == 0){
         /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
@@ -95,6 +124,13 @@ void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_
     }
 }
 
+/* Fonction rotation
+* But: tourne la tuile sur elle-même
+* Paramètres : 
+*    - angle : valeur indiquant combien de fois on tourne la tuile de 90 degrés
+*    - tile : tuile à tourner ou non
+* Retourne 0 pour que ça serve de condition d'arrêt total de la fonction
+* Modifie les paramètres de la tuile */
 int rotation(int angle,t_tuile *tile){
     int inter = tile->tileN;
     
@@ -267,7 +303,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
             }
         }
         if (parcours_case == 0){
-            while (max == 0){
+            /*while (max == 0){
                 for (int i = -indice;i <= indice;i++){
                     if ((arrivee[0] == 0) && (i < 0)){
                         continue;
@@ -306,7 +342,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
                     }
                 }
                 indice = indice + 1;
-            }
+            }*/
 
             for (int i = 0;i < ty;i++){
                 for (int j = 0;j < tx;j++){
