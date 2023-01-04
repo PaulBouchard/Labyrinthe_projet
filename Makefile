@@ -5,7 +5,7 @@ CC = gcc
 CCFLAGS = -Wall
 
 # fichiers du projet
-SRC = deblab.c labyrinthAPI.c clientAPI.c
+SRC = deblab.c labyrinthAPI.c clientAPI.c fonclab.c
 OBJ = $(SRC:.c=.o)
 EXEC = labyrinthe.out
 
@@ -25,6 +25,11 @@ labyrinthAPI.o: labyrinthAPI.c labyrinthAPI.h
 clientAPI.o: clientAPI.c clientAPI.h
 %.o: %.c
 	$(CC) $(CCFLAGS) -o $@ -c $<	
+
+fonclab.o: fonclab.c fonclab.h
+%.o: %.c
+	$(CC) $(CCFLAGS) -o $@ -c $<
+
 # règles d'édition de liens
 $(EXEC): $(OBJ)
 	$(CC) $(CCFLAGS) -o $@ $^
