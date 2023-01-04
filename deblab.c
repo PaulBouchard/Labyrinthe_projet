@@ -150,6 +150,15 @@ int rotation(int angle,t_tuile *tile){
     return 0;   // Au cas où
 }
 
+/* Fonction deplacementJoueur
+* But: vérifier si un joueur est sur une rangée qui est supposé être modifié et changer sa position en conséquence
+* Paramètres : 
+*    - positionBouge,positionBougePas : les entiers indiquant les coordonnées du joueur
+*    - plusmoins : dépendant du mouvement de la rangée, on additionne à une coordonnée du joueur pour la modifier si il
+*      est dessus
+*    - max,min : position maximal et minimal où peut potentiellement être le joueur
+* Retourne la coordonnée qui est potentiellement différente 
+* Modifie rien */
 int deplacementJoueur(int positionbouge,int positionbougepas,int rangee,int plusmoins,int max,int min){
     if (positionbougepas == rangee){
         if (positionbouge == max){
@@ -162,6 +171,16 @@ int deplacementJoueur(int positionbouge,int positionbougepas,int rangee,int plus
     return positionbouge;
 }
 
+/* Fonction MaJDonnees
+* But: met à jour les données du labyrinthe et le tableau le représentant
+* Paramètres : 
+*    - mouvement : variable de type t_move contenant les paramètres du dernier mouvement joué
+*    - donnees : données du labyrinthe
+*    - tx,ty : longueur et largeur du labyrinthe
+*    - laby : tableau de tuiles 
+*    - num_joueur : entier indiquant quel joueur vient de jouer
+* Retourne rien
+* Modifie les positions, la tuile supplémentaire, le tableau */
 void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile laby[ty][tx],int num_joueur){
     t_tuile inter;
 
@@ -253,6 +272,16 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile la
     }
 }
 
+/* Fonction resetLabyrinth
+* But: copier le labyrinthe dans un autre tableau et y mettre les trésors à zéro et récupérer les coordonnées du trésor
+* Paramètres : 
+*    - tx,ty : longueur et largeur du labyrinthe
+*    - labareset : tableau vide qui va copier exempleLab et avoir ses indices de trésor mis à zéro
+*    - exempleLab : tableau contenant toutes les informations sur les tuiles
+*    - arrivee : liste contenant les coordonnées du prochain trésor à trouver
+*    - tresor : indice du prochain trésor à trouver
+* Retourne rien
+* Modifie labareset et arrivee */
 void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[ty][tx],int arrivee[2],int tresor){
     for (int i = 0;i < ty;i++){
         for (int j = 0;j < tx;j++){
@@ -266,6 +295,15 @@ void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[t
     }
 }
 
+/* Fonction expansion
+* But: chercher un chemin pour atteindre le trésor
+* Paramètres : 
+*    - tx,ty : longueur et largeur du labyrinthe
+*    - laby : tableau à parcourir
+*    - arrivee : liste contenant les coordonnées du prochain trésor à trouver
+*    - depart : coordonnées de départ
+* Retourne -1 si il existe un chemin pour atteindre le trésor, sinon il renvoie le nombre de pas maximum faits
+* Modifie arrivee dans le cas où le trésor ne peut être atteint */
 int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
     int r = 1;
     int indice = 1;
@@ -362,6 +400,16 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
     return -1;
 }
 
+/* Fonction coup_auto
+* But: fait un coup automatiquement selon les possibles chemin que peut faire le joueur pour atteindre le trésor
+* Paramètres : 
+*    - mouvement : mouvement du joueur a modifié
+*    - donnees : positions et tuile supplémentaire servant pour voir les différentes possibilités d'insertions de tuile
+*    - tx,ty : longueur et largeur du labyrinthe
+*    - laby : tableau à parcourir et modifier selon les cas
+*    - ancienmouv : ancien mouvement pour ne pas faire l'insertion inverse
+* Retourne 1 si un chemin vers le trésor est possible, 0 sinon (sert à arrêter la fonction)
+* Modifie le mouvement */
 int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx],t_move ancienmouv){
     /* Déclaration des variables (intermédiaire pour la plupart) */
     t_tuile tuile_suppinter = donnees.tuile_supplementaire;
