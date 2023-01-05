@@ -14,20 +14,18 @@
  */
 void demande_coup_joueur(t_move * mouvement){
     int intermediaire_typenum;
-    /*printf("Entrez un chiffre entre 0 et 3 indiquant par quel côté la piece sera insérée (0=O,1=E,2=N,S=3)\n");
-    
+    printf("Entrez un chiffre entre 0 et 3 indiquant par quel côté la piece sera insérée (0=O,1=E,2=N,S=3)\n");
+    scanf("%d",&intermediaire_typenum);
+    mouvement->insert = intermediaire_typenum;
         
     printf("Entrez le numéro de la ligne ou de la colonne dans laquelle ira la pièce\n");
     scanf("%d",&mouvement->number);
         
     printf("Entrez un chiffre entre 0 et 3 indiquant la rotation appliquée à la pièce en sens horaire\n");
     scanf("%d",&mouvement->rotation);
-    printf("Entrez les coordonnées de la case où vous voulez aller (x y)\n");
-    scanf("%d %d",&mouvement->x,&mouvement->y);*/
 
-    printf("Coup -> ");
-    scanf("%d %d %d %d %d",&intermediaire_typenum,&mouvement->number,&mouvement->rotation,&mouvement->x,&mouvement->y);
-    mouvement->insert = intermediaire_typenum;
+    printf("Entrez les coordonnées de la case où vous voulez aller (x y)\n");
+    scanf("%d %d",&mouvement->x,&mouvement->y);
 }
 
 /* ----------------------------------------------------------------
@@ -330,7 +328,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
                     if (arrivee[0]+i > ty-1){
                         continue;
                     }
-                    if ((arrivee[0] == ty-1) && (i > ty-1)){
+                    if ((arrivee[0] == ty-1) && (i > 0)){
                         continue;
                     }
                     for (int j = -indice;j <= indice;j++){
@@ -343,7 +341,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
                         if (arrivee[1]+j > tx-1){
                             continue;
                         }
-                        if ((arrivee[1] == tx-1) && (j > tx-1)){
+                        if ((arrivee[1] == tx-1) && (j > 0)){
                             continue;
                         }
                         if ((i == 0) && (j == 0)){
@@ -398,9 +396,13 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     int arrivee[2];
     int chemin;
 
+    if (donnees.joueur1.nextI == donnees.tuile_supplementaire.tileI){
+        printf("EREEUR");
+        return 1;
+    }
+
     /* insert = 0 */
     for (int i = 1;i < ty;i = i + 2){
-        
         /* Pour éviter de réinsérer la tuile qui vient d'être extraite */
         if ((ancienmouv.insert == 1) && (ancienmouv.number == i)){
             continue;
@@ -408,6 +410,9 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
 
         for (int k = 0;k < 4;k++){
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+            if ((arrivee[0] == i) && (arrivee[1] == tx-1)){
+                continue;
+            }
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
             depart[0] = donnees.joueur1.y;
@@ -456,6 +461,9 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
 
         for (int k = 0;k < 4;k++){
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+            if ((arrivee[0] == i) && (arrivee[1] == 0)){
+                continue;
+            }
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
             depart[0] = donnees.joueur1.y;
@@ -504,6 +512,9 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
 
         for (int k = 0;k<4;k++){
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+            if ((arrivee[1] == i) && (arrivee[0] == ty-1)){
+                continue;
+            }
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
             depart[0] = donnees.joueur1.y;
@@ -545,6 +556,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     
     /* insert = 3 */
     for (int i = 1;i < tx;i = i + 2){
+        
         /* Pour éviter de réinsérer la tuile qui vient d'être extraite */
         if ((ancienmouv.insert == 2) && (ancienmouv.number == i)){
             continue;
@@ -552,6 +564,9 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
 
         for (int k = 0;k<4;k++){
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+            if ((arrivee[1] == i) && (arrivee[0] == 0)){
+                continue;
+            }
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
             depart[0] = donnees.joueur1.y;

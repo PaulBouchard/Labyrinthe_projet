@@ -13,7 +13,7 @@ int main(void){
     t_labyrinthe donnees;
 
     /* Connection au serveur et récupération des tailles */
-    connectToServer("172.105.76.204",1234,"Paul");
+    connectToServer("172.105.76.204",1234,"joueurtest");
     waitForLabyrinth("TRAINING BASIC timeout=1000",nom_jeu,&tailleX,&tailleY);
     printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
     
@@ -24,7 +24,7 @@ int main(void){
     /* Initialisation du jeu avec les données de départ */
     t_tuile labyrinthe[tailleY][tailleX];
     init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe,numero_joueur_depart);    
-    
+
     /* Début de partie */
     while (1){
         /* Si c'est le joueur 1 qui commence */
