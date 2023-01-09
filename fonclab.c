@@ -317,6 +317,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
             }
         }
         if (parcours_case == 0){
+            
             while (max == 0){
                 for (int i = -indice;i <= indice;i++){
                     if ((arrivee[0] == 0) && (i < 0)){
@@ -396,10 +397,6 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     int arrivee[2];
     int chemin;
 
-    if (donnees.joueur1.nextI == donnees.tuile_supplementaire.tileI){
-        printf("EREEUR");
-        return 1;
-    }
 
     /* insert = 0 */
     for (int i = 1;i < ty;i = i + 2){
@@ -409,7 +406,10 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         }
 
         for (int k = 0;k < 4;k++){
+            /* On intialise le labyrinthe avec toutes les cases item à 0 et on collecte les coordonnées d'arrivée */
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+
+            /* Si le trésor est à l'extrémité et peut être poussée hors du labyrinthe, on skip ce coup */
             if ((arrivee[0] == i) && (arrivee[1] == tx-1)){
                 continue;
             }
@@ -430,6 +430,14 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite on cherche un chemin */
             depart[1] = deplacementJoueur(donnees.joueur1.x,donnees.joueur1.y,i,1,tx-1,0);
             arrivee[1] = deplacementJoueur(arrivee[1],arrivee[0],i,1,tx-1,0);
+
+            /* Si le trésor est dans la tuile supplémentaire, on prend pour coord d'arrivée celle de la tuile insérée */
+            if (donnees.joueur1.nextI == donnees.tuile_supplementaire.tileI){
+                arrivee[0] = i;
+                arrivee[1] = 0;
+            }
+
+            /* On vérifie si un chemin existe */
             chemin = expansion(tx,ty,labinter,depart,arrivee);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
@@ -460,7 +468,10 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         }
 
         for (int k = 0;k < 4;k++){
+            /* On intialise le labyrinthe avec toutes les cases item à 0 et on collecte les coordonnées d'arrivée */
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+
+            /* Si le trésor est à l'extrémité et peut être poussée hors du labyrinthe, on skip ce coup */
             if ((arrivee[0] == i) && (arrivee[1] == 0)){
                 continue;
             }
@@ -481,6 +492,14 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite on cherche un chemin */
             depart[1] = deplacementJoueur(donnees.joueur1.x,donnees.joueur1.y,i,-1,0,tx-1);
             arrivee[1] = deplacementJoueur(arrivee[1],arrivee[0],i,-1,0,tx-1);
+
+            /* Si le trésor est dans la tuile supplémentaire, on prend pour coord d'arrivée celle de la tuile insérée */
+            if (donnees.joueur1.nextI == donnees.tuile_supplementaire.tileI){
+                arrivee[0] = i;
+                arrivee[1] = tx-1;
+            }
+
+            /* On vérifie si un chemin existe */
             chemin = expansion(tx,ty,labinter,depart,arrivee);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
@@ -511,7 +530,10 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         }
 
         for (int k = 0;k<4;k++){
+            /* On intialise le labyrinthe avec toutes les cases item à 0 et on collecte les coordonnées d'arrivée */
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+
+            /* Si le trésor est à l'extrémité et peut être poussée hors du labyrinthe, on skip ce coup */
             if ((arrivee[1] == i) && (arrivee[0] == ty-1)){
                 continue;
             }
@@ -532,6 +554,14 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite on cherche un chemin */
             depart[0] = deplacementJoueur(donnees.joueur1.y,donnees.joueur1.x,i,1,ty-1,0);
             arrivee[0] = deplacementJoueur(arrivee[0],arrivee[1],i,1,ty-1,0);
+
+            /* Si le trésor est dans la tuile supplémentaire, on prend pour coord d'arrivée celle de la tuile insérée */
+            if (donnees.joueur1.nextI == donnees.tuile_supplementaire.tileI){
+                arrivee[0] = 0;
+                arrivee[1] = i;
+            }
+
+            /* On vérifie si un chemin existe */
             chemin = expansion(tx,ty,labinter,depart,arrivee);
             
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
@@ -563,7 +593,10 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         }
 
         for (int k = 0;k<4;k++){
+            /* On intialise le labyrinthe avec toutes les cases item à 0 et on collecte les coordonnées d'arrivée */
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+
+            /* Si le trésor est à l'extrémité et peut être poussée hors du labyrinthe, on skip ce coup */
             if ((arrivee[1] == i) && (arrivee[0] == 0)){
                 continue;
             }
@@ -584,6 +617,14 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite on cherche un chemin */
             depart[0] = deplacementJoueur(donnees.joueur1.y,donnees.joueur1.x,i,-1,0,ty-1);
             arrivee[0] = deplacementJoueur(arrivee[0],arrivee[1],i,-1,0,ty-1);
+
+            /* Si le trésor est dans la tuile supplémentaire, on prend pour coord d'arrivée celle de la tuile insérée */
+            if (donnees.joueur1.nextI == donnees.tuile_supplementaire.tileI){
+                arrivee[0] = ty-1;
+                arrivee[1] = i;
+            }
+
+            /* On vérifie si un chemin existe */
             chemin = expansion(tx,ty,labinter,depart,arrivee);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
