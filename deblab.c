@@ -9,6 +9,7 @@ int main(void){
     int numero_joueur_depart,num_mouv_joueur,num_mouv_bot;
     int tailleX,tailleY,case_N,case_E,case_S,case_O,case_I;
     char nom_jeu[50];
+    t_position liste_position[500];
     t_move mouv_joueur,mouv_bot;
     t_labyrinthe donnees;
 
@@ -23,16 +24,19 @@ int main(void){
     
     /* Initialisation du jeu avec les données de départ */
     t_tuile labyrinthe[tailleY][tailleX];
-    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe,numero_joueur_depart);    
+    int indicemouv = 1;
+    init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe,numero_joueur_depart,liste_position);    
+    
 
     /* Début de partie */
     while (1){
         /* Si c'est le joueur 1 qui commence */
         if (numero_joueur_depart == 0){
             printLabyrinth();
-        
-            coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot);
+            
+            coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot,liste_position,indicemouv);
             num_mouv_joueur = sendMove(&mouv_joueur);
+            printf("[%d %d %d %d %d]\n\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
             if (num_mouv_joueur != 0){
                 if (num_mouv_joueur == 1){
                     printf("Vous avez gagné\n");
@@ -45,7 +49,8 @@ int main(void){
                     return 0;
                 }
             }
-            MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0);
+            MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0,liste_position,indicemouv);
+            indicemouv = indicemouv + 1;
                         
             num_mouv_bot = getMove(&mouv_bot);
             if (num_mouv_bot != 0){
@@ -60,7 +65,7 @@ int main(void){
                     return 0;
                 }
             }
-            MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1);
+            MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1,liste_position,indicemouv);
         }
         
         else if (numero_joueur_depart == 1){
@@ -78,11 +83,11 @@ int main(void){
                     return 0;
                 }
             }
-            MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1);
+            MaJDonnees(mouv_bot,&donnees,tailleX,tailleY,labyrinthe,1,liste_position,indicemouv);
 
             printLabyrinth();
 
-            coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot);
+            coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot,liste_position,indicemouv);
             num_mouv_joueur = sendMove(&mouv_joueur);
             if (num_mouv_joueur != 0){
                 if (num_mouv_joueur == 1){
@@ -96,7 +101,8 @@ int main(void){
                     return 0;
                 }
             }
-            MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0);
+            MaJDonnees(mouv_joueur,&donnees,tailleX,tailleY,labyrinthe,0,liste_position,indicemouv);
+            indicemouv = indicemouv + 1;
         }
     }
     closeConnection();

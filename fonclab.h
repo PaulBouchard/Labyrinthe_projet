@@ -55,7 +55,7 @@ void demande_coup_joueur(t_move * mouvement);
  * Retourne rien
  * Modifie donnees,look
  */
-void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx],int premierJoueur);
+void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx],int premierJoueur,t_position liste[500]);
 
 /* ----------------------------------
  * But: tourne la tuile sur elle-même
@@ -90,7 +90,7 @@ int deplacementJoueur(int positionbouge,int positionbougepas,int rangee,int plus
  * Retourne rien
  * Modifie les positions, la tuile supplémentaire, le tableau
  */
-void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile laby[ty][tx],int num_joueur);
+void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile laby[ty][tx],int num_joueur,t_position liste[500],int indicemouv);
 
 /* --------------------------------------------------------------------------------------------------------------------
  * But: copier le labyrinthe dans un autre tableau et y mettre les trésors à zéro et récupérer les coordonnées du trésor
@@ -115,7 +115,7 @@ void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[t
  * Retourne -1 si il existe un chemin pour atteindre le trésor, sinon il renvoie le nombre de pas maximum faits
  * Modifie arrivee dans le cas où le trésor ne peut être atteint
  */
-int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]);
+int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2],int bloque);
 
 /* --------------------------------------------------------------------------------------------------------------
  * But: fait un coup automatiquement selon les possibles chemin que peut faire le joueur pour atteindre le trésor
@@ -128,6 +128,6 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]);
  * Retourne 1 si un chemin vers le trésor est possible, 0 sinon (sert à arrêter la fonction)
  * Modifie le mouvement
  */
-int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx],t_move ancienmouv);
+int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx],t_move ancienmouv,t_position liste_pos[500],int indicemouv);
 
 #endif

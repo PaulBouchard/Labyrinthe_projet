@@ -14,6 +14,7 @@
  */
 void demande_coup_joueur(t_move * mouvement){
     int intermediaire_typenum;
+    
     printf("Entrez un chiffre entre 0 et 3 indiquant par quel côté la piece sera insérée (0=O,1=E,2=N,S=3)\n");
     scanf("%d",&intermediaire_typenum);
     mouvement->insert = intermediaire_typenum;
@@ -40,12 +41,14 @@ void demande_coup_joueur(t_move * mouvement){
  * Retourne rien
  * Modifie donnees,look
  */
-void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx],int premierJoueur){
+void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx],int premierJoueur,t_position liste[500]){
     if (premierJoueur == 0){
         /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
         donnees->joueur1.x = 0;
         donnees->joueur1.y = 0;
         donnees->joueur1.nextI = 1;
+        liste[0].x = 0;
+        liste[0].y = 0;
 
         /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
         donnees->joueur2.x = tx - 1;
@@ -57,6 +60,8 @@ void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_
         donnees->joueur1.x = tx-1;
         donnees->joueur1.y = ty-1;
         donnees->joueur1.nextI = 24;
+        liste[0].x = tx-1;
+        liste[0].y = ty-1;
 
         /* Initialisation de la position et du prochain trésor à trouver du joueur 2 */
         donnees->joueur2.x = 0;
@@ -155,7 +160,7 @@ int deplacementJoueur(int positionbouge,int positionbougepas,int rangee,int plus
  * Retourne rien
  * Modifie les positions, la tuile supplémentaire, le tableau
  */
-void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile laby[ty][tx],int num_joueur){
+void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile laby[ty][tx],int num_joueur,t_position liste[500],int indicemouv){
     t_tuile inter;
 
     /* Modification du labyrinthe selon la tuile insérée et le côté choisi et modif de la position des joueurs*/
@@ -174,7 +179,7 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile la
 
         /* Mise à jour des position des joueurs au cas où ils soient sur la ligne modifiée */
         donnees->joueur1.x = deplacementJoueur(donnees->joueur1.x,donnees->joueur1.y,mouvement.number,1,tx-1,0);
-        donnees->joueur2.x = deplacementJoueur(donnees->joueur2.x,donnees->joueur2.y,mouvement.number,1,tx-1,0);
+        donnees->joueur2.x = deplacementJoueur(donnees->joueur2.x,donnees->joueur2.y,mouvement.number,1,tx-1,0);        
     }
 
     /* Modif du labyrinthe et des positions en "poussant" les tuiles d'une des lignes vers la gauche */
@@ -243,6 +248,8 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile la
         donnees->joueur1.x = mouvement.x;
         donnees->joueur1.y = mouvement.y;
         donnees->joueur1.nextI = mouvement.nextItem;
+        liste[indicemouv].x = mouvement.x;
+        liste[indicemouv].y = mouvement.y;
     }
 }
 
@@ -280,7 +287,7 @@ void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[t
  * Retourne -1 si il existe un chemin pour atteindre le trésor, sinon il renvoie le nombre de pas maximum faits
  * Modifie arrivee dans le cas où le trésor ne peut être atteint
  */
-int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
+int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2],int bloque){
     int r = 1;
     int indice = 1;
     int max = 0;
@@ -317,57 +324,59 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
             }
         }
         if (parcours_case == 0){
-            
-            while (max == 0){
-                for (int i = -indice;i <= indice;i++){
-                    if ((arrivee[0] == 0) && (i < 0)){
-                        continue;
+            if (bloque == 0){
+                while (max == 0){
+                    for (int i = -indice;i <= indice;i++){
+                        if ((arrivee[0] == 0) && (i < 0)){
+                            continue;
+                        }
+                        if (arrivee[0]+i < 0){
+                            continue;
+                        }
+                        if (arrivee[0]+i > ty-1){
+                            continue;
+                        }
+                        if ((arrivee[0] == ty-1) && (i > 0)){
+                            continue;
+                        }
+                        for (int j = -indice;j <= indice;j++){
+                            if ((arrivee[1] == 0) && (j < 0)){
+                                continue;
+                            }
+                            if (arrivee[1]+j < 0){
+                                continue;
+                            }
+                            if (arrivee[1]+j > tx-1){
+                                continue;
+                            }
+                            if ((arrivee[1] == tx-1) && (j > 0)){
+                                continue;
+                            }
+                            if ((i == 0) && (j == 0)){
+                                continue;
+                            }
+                            if (laby[arrivee[0]+i][arrivee[1]+j].tileI != 0){
+                                max = laby[arrivee[0]+i][arrivee[1]+j].tileI;
+                                arrivee[0] = arrivee[0]+i;
+                                arrivee[1] = arrivee[1]+j;
+                                return 1;
+                            }
+                        }
                     }
-                    if (arrivee[0]+i < 0){
-                        continue;
-                    }
-                    if (arrivee[0]+i > ty-1){
-                        continue;
-                    }
-                    if ((arrivee[0] == ty-1) && (i > 0)){
-                        continue;
-                    }
-                    for (int j = -indice;j <= indice;j++){
-                        if ((arrivee[1] == 0) && (j < 0)){
-                            continue;
-                        }
-                        if (arrivee[1]+j < 0){
-                            continue;
-                        }
-                        if (arrivee[1]+j > tx-1){
-                            continue;
-                        }
-                        if ((arrivee[1] == tx-1) && (j > 0)){
-                            continue;
-                        }
-                        if ((i == 0) && (j == 0)){
-                            continue;
-                        }
-                        if (laby[arrivee[0]+i][arrivee[1]+j].tileI != 0){
-                            max = laby[arrivee[0]+i][arrivee[1]+j].tileI;
-                            arrivee[0] = arrivee[0]+i;
-                            arrivee[1] = arrivee[1]+j;
-                            return 1;
+                    indice = indice + 1;
+                }
+            }
+            else{
+                for (int i = 0;i < ty;i++){
+                    for (int j = 0;j < tx;j++){
+                        if (laby[i][j].tileI == r){
+                            arrivee[0] = i;
+                            arrivee[1] = j;
                         }
                     }
                 }
-                indice = indice + 1;
             }
-
-            for (int i = 0;i < ty;i++){
-                for (int j = 0;j < tx;j++){
-                    if (laby[i][j].tileI == r){
-                        arrivee[0] = i;
-                        arrivee[1] = j;
-                    }
-                }
-            }
-            return r;
+            return r; 
         }
         else{
             parcours_case = 0;
@@ -388,7 +397,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2]){
  * Retourne 1 si un chemin vers le trésor est possible, 0 sinon (sert à arrêter la fonction)
  * Modifie le mouvement
  */
-int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx],t_move ancienmouv){
+int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby[ty][tx],t_move ancienmouv,t_position liste_pos[500],int indicemouv){
     /* Déclaration des variables (intermédiaire pour la plupart) */
     t_tuile tuile_suppinter = donnees.tuile_supplementaire;
     t_tuile inter;
@@ -396,7 +405,31 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     int depart[2] = {donnees.joueur1.y,donnees.joueur1.x};
     int arrivee[2];
     int chemin;
+    int bloque = 0;
 
+
+
+    resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+    if ((depart[0] == arrivee[0]) && (depart[1] == arrivee[1])){
+        mouvement->insert = 0;
+        if (depart[0] != 5){
+            mouvement->number = 5;
+        }
+        else{
+            mouvement->number = 1;
+        }
+        mouvement->rotation = 0;
+        mouvement->x = depart[1];
+        mouvement->y = depart[0];
+        return 1;
+    }
+
+    /* Si on ça fait déjà deux tours qu'on ne bouge pas, on va changer la méthode de déplacement */
+    if (indicemouv >= 2){
+        if ((liste_pos[indicemouv-1].x == liste_pos[indicemouv-2].x) && (liste_pos[indicemouv-1].y == liste_pos[indicemouv-2].y)){
+            bloque = 1;
+        }
+    }
 
     /* insert = 0 */
     for (int i = 1;i < ty;i = i + 2){
@@ -438,7 +471,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
 
             /* On vérifie si un chemin existe */
-            chemin = expansion(tx,ty,labinter,depart,arrivee);
+            chemin = expansion(tx,ty,labinter,depart,arrivee,bloque);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
             if (chemin == -1){
@@ -500,7 +533,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
 
             /* On vérifie si un chemin existe */
-            chemin = expansion(tx,ty,labinter,depart,arrivee);
+            chemin = expansion(tx,ty,labinter,depart,arrivee,bloque);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
             if (chemin == -1){
@@ -562,7 +595,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
 
             /* On vérifie si un chemin existe */
-            chemin = expansion(tx,ty,labinter,depart,arrivee);
+            chemin = expansion(tx,ty,labinter,depart,arrivee,bloque);
             
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
             if (chemin == -1){
@@ -625,7 +658,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
 
             /* On vérifie si un chemin existe */
-            chemin = expansion(tx,ty,labinter,depart,arrivee);
+            chemin = expansion(tx,ty,labinter,depart,arrivee,bloque);
 
             /* Si un chemin existe on modifie le mouvement accordément puis on termine la fonction */
             if (chemin == -1){
