@@ -324,7 +324,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2],in
             }
         }
         if (parcours_case == 0){
-            if (bloque == 0){
+            if (bloque == 1){
                 while (max == 0){
                     for (int i = -indice;i <= indice;i++){
                         if ((arrivee[0] == 0) && (i < 0)){
@@ -406,8 +406,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     int arrivee[2];
     int chemin;
     int bloque = 0;
-
-
+    int maxDistance = 0;
 
     resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
     if ((depart[0] == arrivee[0]) && (depart[1] == arrivee[1])){
@@ -483,7 +482,8 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                 return 1;
             }
             /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
-            else{
+            else if (maxDistance < chemin){
+                maxDistance = chemin;
                 mouvement->insert = 0;
                 mouvement->number = i;
                 mouvement->rotation = k;
@@ -545,7 +545,8 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                 return 1;
             }
             /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
-            else{
+            else if (maxDistance < chemin){
+                maxDistance = chemin;
                 mouvement->insert = 1;
                 mouvement->number = i;
                 mouvement->rotation = k;
@@ -607,7 +608,8 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                 return 1;
             }
             /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
-            else{
+            else if (maxDistance < chemin){
+                maxDistance = chemin;
                 mouvement->insert = 2;
                 mouvement->number = i;
                 mouvement->rotation = k;
@@ -670,7 +672,8 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                 return 1;
             }
             /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
-            else{
+            else if (maxDistance < chemin){
+                maxDistance = chemin;
                 mouvement->insert = 3;
                 mouvement->number = i;
                 mouvement->rotation = k;
