@@ -114,5 +114,6 @@ int main(void){
     }
 
     closeConnection();
+    
     return 0;
 }
