@@ -36,7 +36,8 @@ int main(void){
             
             coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot,liste_position,indicemouv);
             num_mouv_joueur = sendMove(&mouv_joueur);
-            printf("[%d %d %d %d %d]\n\n",mouv_joueur.insert,mouv_joueur.number,mouv_joueur.rotation,mouv_joueur.x,mouv_joueur.y);
+            
+            /* Si le mouvement n'est pas normal (!=0) */
             if (num_mouv_joueur != 0){
                 if (num_mouv_joueur == 1){
                     printf("Vous avez gagné\n");
@@ -53,6 +54,8 @@ int main(void){
             indicemouv = indicemouv + 1;
                         
             num_mouv_bot = getMove(&mouv_bot);
+
+            /* Si le mouvement n'est pas normal (!=0) */
             if (num_mouv_bot != 0){
                 if (num_mouv_bot == 1){
                     printf("Vous avez perdu\n");
@@ -71,6 +74,8 @@ int main(void){
         else if (numero_joueur_depart == 1){
             
             num_mouv_bot = getMove(&mouv_bot);
+
+            /* Si le mouvement n'est pas normal (!=0) */
             if (num_mouv_bot != 0){
                 if (num_mouv_bot == 1){
                     printf("Vous avez perdu\n");
@@ -89,6 +94,8 @@ int main(void){
 
             coup_auto(&mouv_joueur,donnees,tailleX,tailleY,labyrinthe,mouv_bot,liste_position,indicemouv);
             num_mouv_joueur = sendMove(&mouv_joueur);
+
+            /* Si le mouvement n'est pas normal (!=0) */
             if (num_mouv_joueur != 0){
                 if (num_mouv_joueur == 1){
                     printf("Vous avez gagné\n");
@@ -105,7 +112,7 @@ int main(void){
             indicemouv = indicemouv + 1;
         }
     }
+
     closeConnection();
-    printf("AU REVOIR\n");
     return 0;
 }
