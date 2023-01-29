@@ -16,7 +16,7 @@ int main(void){
     /* Connection au serveur et récupération des tailles */
     connectToServer("172.105.76.204",1234,"joueurtest");
     waitForLabyrinth("TRAINING BASIC timeout=1000",nom_jeu,&tailleX,&tailleY);
-    printf("tailleX = %d\ntailleY = %d\nseed = %s\n",tailleX,tailleY,nom_jeu);
+    printf("\nseed = %s\n",nom_jeu);
     
     /* Récupération du labyrinthe et de la case supplémentaire */
     int * lab = malloc(5*tailleX*tailleY*sizeof(int));
@@ -28,6 +28,7 @@ int main(void){
     init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe,numero_joueur_depart,liste_position);    
     
     printLabyrinth();
+    
     /* Début de partie */
     while (1){
         /* Si c'est le joueur 1 qui commence */ 
