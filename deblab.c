@@ -27,10 +27,10 @@ int main(void){
     int indicemouv = 1;
     init_type(&donnees,case_N,case_E,case_S,case_O,case_I,lab,tailleX,tailleY,labyrinthe,numero_joueur_depart,liste_position);    
     
-
+    printLabyrinth();
     /* Début de partie */
     while (1){
-        /* Si c'est le joueur 1 qui commence */
+        /* Si c'est le joueur 1 qui commence */ 
         if (numero_joueur_depart == 0){
             printLabyrinth();
             

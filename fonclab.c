@@ -684,4 +684,3 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     }
     return 0;
 }
-
