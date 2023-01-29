@@ -42,6 +42,7 @@ void demande_coup_joueur(t_move * mouvement){
  * Modifie donnees,look
  */
 void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_O,int case_I,int * lab,int tx,int ty,t_tuile look[ty][tx],int premierJoueur,t_position liste[500]){
+    /* Cas où je commence */
     if (premierJoueur == 0){
         /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
         donnees->joueur1.x = 0;
@@ -55,6 +56,8 @@ void init_type(t_labyrinthe * donnees,int case_N,int case_E,int case_S,int case_
         donnees->joueur2.y = ty - 1;
         donnees->joueur2.nextI = 24;
     }
+
+    /* Cas où le joueur adverse commence */
     else if (premierJoueur == 1){
         /* Initialisation de la position et du prochain trésor à trouver du joueur 1 */
         donnees->joueur1.x = tx-1;
@@ -157,6 +160,8 @@ int deplacementJoueur(int positionbouge,int positionbougepas,int rangee,int plus
  *    - tx,ty : longueur et largeur du labyrinthe
  *    - laby : tableau de tuiles 
  *    - num_joueur : entier indiquant quel joueur vient de jouer
+ *    - liste : liste des précédentes coordonnées
+ *    - indicemouv : indice de la liste précédente
  * Retourne rien
  * Modifie les positions, la tuile supplémentaire, le tableau
  */
@@ -267,12 +272,12 @@ void MaJDonnees(t_move mouvement,t_labyrinthe * donnees,int tx,int ty,t_tuile la
 void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[ty][tx],int arrivee[2],int tresor){
     for (int i = 0;i < ty;i++){
         for (int j = 0;j < tx;j++){
-            labareset[i][j] = exempleLab[i][j];
-            if (tresor == exempleLab[i][j].tileI){
+            labareset[i][j] = exempleLab[i][j];     // Copie des tuiles de exempleLab
+            if (tresor == exempleLab[i][j].tileI){  // Récupération des coordonnées du trésor
                 arrivee[0] = i;
                 arrivee[1] = j;
             }
-            labareset[i][j].tileI = 0;
+            labareset[i][j].tileI = 0;              // Mise à zéro des cases item
         }
     }
 }
@@ -284,6 +289,7 @@ void resetLabyrinth(int tx,int ty,t_tuile labareset[ty][tx],t_tuile exempleLab[t
  *    - laby : tableau à parcourir
  *    - arrivee : liste contenant les coordonnées du prochain trésor à trouver
  *    - depart : coordonnées de départ
+ *    - bloque : valeur indiquant si le joueur est bloqué depuis plus de deux tours
  * Retourne -1 si il existe un chemin pour atteindre le trésor, sinon il renvoie le nombre de pas maximum faits
  * Modifie arrivee dans le cas où le trésor ne peut être atteint
  */
@@ -292,7 +298,7 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2],in
     int indice = 1;
     int max = 0;
     laby[depart[0]][depart[1]].tileI = r;
-    int parcours_case = 0;
+    int parcours_case = 0;                  // Variable qui permet de savoir si il existe un chemin pour atteindre le trésor
     laby[arrivee[0]][arrivee[1]].tileI = 0;
     
     while (laby[arrivee[0]][arrivee[1]].tileI == 0){
@@ -323,9 +329,13 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2],in
                 }
             }
         }
-        if (parcours_case == 0){
+        if (parcours_case == 0){        // Cas où il n'y a pas de chemin pour atteindre le trésor
+            /* Méthode 1 : on cherche les cases atteintes qui se rapprochent le plus du trésor */
+            /* Si ça fait déjà deux coups qu'on est à la même position on utilise cette méthode */
             if (bloque == 1){
                 while (max == 0){
+                    /* On cherche les cases atteintes autour de la case contenant le trésor en augmentant le périmètre */
+                    /* de recherche si on ne trouve rien directement autour */
                     for (int i = -indice;i <= indice;i++){
                         if ((arrivee[0] == 0) && (i < 0)){
                             continue;
@@ -366,6 +376,8 @@ int expansion(int tx,int ty,t_tuile laby[ty][tx],int depart[2],int arrivee[2],in
                     indice = indice + 1;
                 }
             }
+
+            /* Méthode 2 : on récupère les coordonnées de la case dernièrement atteinte */
             else{
                 for (int i = 0;i < ty;i++){
                     for (int j = 0;j < tx;j++){
@@ -409,6 +421,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
     int maxDistance = 0;
 
     resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
+    /* Cas où le joueur apparaît sur la case contenant le trésor */
     if ((depart[0] == arrivee[0]) && (depart[1] == arrivee[1])){
         mouvement->insert = 0;
         if (depart[0] != 5){
@@ -423,7 +436,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
         return 1;
     }
 
-    /* Si on ça fait déjà deux tours qu'on ne bouge pas, on va changer la méthode de déplacement */
+    /* Si on ça fait déjà deux tours qu'on ne bouge pas, on va changer la méthode de déplacement pour chercher le trésor */
     if (indicemouv >= 2){
         if ((liste_pos[indicemouv-1].x == liste_pos[indicemouv-2].x) && (liste_pos[indicemouv-1].y == liste_pos[indicemouv-2].y)){
             bloque = 1;
@@ -437,6 +450,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             continue;
         }
 
+        /* On test pour chaque rotation */
         for (int k = 0;k < 4;k++){
             /* On intialise le labyrinthe avec toutes les cases item à 0 et on collecte les coordonnées d'arrivée */
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
@@ -445,8 +459,12 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             if ((arrivee[0] == i) && (arrivee[1] == tx-1)){
                 continue;
             }
+
+            /* On initialise une tuile intermédiaire contenant la tuile supplémentaire à insérer */
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
+
+            /* On réinitialise les coordonnées de départ contenu dans depart[2] */
             depart[0] = donnees.joueur1.y;
             depart[1] = donnees.joueur1.x;
 
@@ -459,7 +477,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             labinter[i][0] = tuile_suppinter;
             tuile_suppinter = inter;
 
-            /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite on cherche un chemin */
+            /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et ensuite on cherche un chemin */
             depart[1] = deplacementJoueur(donnees.joueur1.x,donnees.joueur1.y,i,1,tx-1,0);
             arrivee[1] = deplacementJoueur(arrivee[1],arrivee[0],i,1,tx-1,0);
 
@@ -481,7 +499,9 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                 mouvement->y = arrivee[0];
                 return 1;
             }
-            /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
+
+            /* Sinon on vérifie si la case atteinte est la plus loin et on modifie le mouvement selon le mouvement testé */
+            /* dans l'itération actuelle */
             else if (maxDistance < chemin){
                 maxDistance = chemin;
                 mouvement->insert = 0;
@@ -500,6 +520,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             continue;
         }
 
+        /* On test pour chaque rotation */
         for (int k = 0;k < 4;k++){
             /* On intialise le labyrinthe avec toutes les cases item à 0 et on collecte les coordonnées d'arrivée */
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
@@ -508,8 +529,12 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             if ((arrivee[0] == i) && (arrivee[1] == 0)){
                 continue;
             }
+
+            /* On initialise une tuile intermédiaire contenant la tuile supplémentaire à insérer */
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
+
+            /* On réinitialise les coordonnées de départ contenu dans depart[2] */
             depart[0] = donnees.joueur1.y;
             depart[1] = donnees.joueur1.x;
         
@@ -522,7 +547,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             labinter[i][tx-1] = tuile_suppinter;
             tuile_suppinter = inter;
 
-            /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite on cherche un chemin */
+            /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et ensuite on cherche un chemin */
             depart[1] = deplacementJoueur(donnees.joueur1.x,donnees.joueur1.y,i,-1,0,tx-1);
             arrivee[1] = deplacementJoueur(arrivee[1],arrivee[0],i,-1,0,tx-1);
 
@@ -544,7 +569,9 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                 mouvement->y = arrivee[0];
                 return 1;
             }
-            /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
+
+            /* Sinon on vérifie si la case atteinte est la plus loin et on modifie le mouvement selon le mouvement testé */
+            /* dans l'itération actuelle */
             else if (maxDistance < chemin){
                 maxDistance = chemin;
                 mouvement->insert = 1;
@@ -563,6 +590,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             continue;
         }
 
+        /* On test pour chaque rotation */
         for (int k = 0;k<4;k++){
             /* On intialise le labyrinthe avec toutes les cases item à 0 et on collecte les coordonnées d'arrivée */
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
@@ -571,8 +599,12 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             if ((arrivee[1] == i) && (arrivee[0] == ty-1)){
                 continue;
             }
+
+            /* On initialise une tuile intermédiaire contenant la tuile supplémentaire à insérer */
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
+
+            /* On réinitialise les coordonnées de départ contenu dans depart[2] */
             depart[0] = donnees.joueur1.y;
             depart[1] = donnees.joueur1.x;
 
@@ -585,7 +617,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             labinter[0][i] = tuile_suppinter;
             tuile_suppinter = inter;
 
-            /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite on cherche un chemin */
+            /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite cherche un chemin */
             depart[0] = deplacementJoueur(donnees.joueur1.y,donnees.joueur1.x,i,1,ty-1,0);
             arrivee[0] = deplacementJoueur(arrivee[0],arrivee[1],i,1,ty-1,0);
 
@@ -607,7 +639,9 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                 mouvement->y = arrivee[0];
                 return 1;
             }
-            /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
+            
+            /* Sinon on vérifie si la case atteinte est la plus loin et on modifie le mouvement selon le mouvement testé */
+            /* dans l'itération actuelle */
             else if (maxDistance < chemin){
                 maxDistance = chemin;
                 mouvement->insert = 2;
@@ -627,6 +661,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             continue;
         }
 
+        /* On test pour chaque rotation */
         for (int k = 0;k<4;k++){
             /* On intialise le labyrinthe avec toutes les cases item à 0 et on collecte les coordonnées d'arrivée */
             resetLabyrinth(tx,ty,labinter,laby,arrivee,donnees.joueur1.nextI);
@@ -635,8 +670,12 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             if ((arrivee[1] == i) && (arrivee[0] == 0)){
                 continue;
             }
+
+            /* On initialise une tuile intermédiaire contenant la tuile supplémentaire à insérer */
             tuile_suppinter = donnees.tuile_supplementaire;
             tuile_suppinter.tileI = 0;
+
+            /* On réinitialise les coordonnées de départ contenu dans depart[2] */
             depart[0] = donnees.joueur1.y;
             depart[1] = donnees.joueur1.x;
 
@@ -649,7 +688,7 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             labinter[ty-1][i] = tuile_suppinter;
             tuile_suppinter = inter;
 
-            /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et on ensuite on cherche un chemin */
+            /* On change la position du joueur et du trésor dans le cas où ils soient sur la rangée modifiée et ensuite on cherche un chemin */
             depart[0] = deplacementJoueur(donnees.joueur1.y,donnees.joueur1.x,i,-1,0,ty-1);
             arrivee[0] = deplacementJoueur(arrivee[0],arrivee[1],i,-1,0,ty-1);
 
@@ -671,7 +710,9 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
                 mouvement->y = arrivee[0];
                 return 1;
             }
-            /* Sinon on réinitialise l'arrangement de labinter ainsi que la tuile supplémentaire et la position du joueur */
+            
+            /* Sinon on vérifie si la case atteinte est la plus loin et on modifie le mouvement selon le mouvement testé */
+            /* dans l'itération actuelle */
             else if (maxDistance < chemin){
                 maxDistance = chemin;
                 mouvement->insert = 3;
@@ -682,5 +723,6 @@ int coup_auto(t_move * mouvement,t_labyrinthe donnees,int tx,int ty,t_tuile laby
             }
         }
     }
+    
     return 0;
 }
